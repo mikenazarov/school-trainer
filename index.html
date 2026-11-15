@@ -171,7 +171,7 @@ const CFG=window.SYNC||{};
 /* Supabase: two database functions guard the table, so only someone with the code can read or write */
 async function rpc(fn,body){
   const r=await fetch(CFG.url.replace(/\/$/,"")+"/rest/v1/rpc/"+fn,{method:"POST",
-    headers:{"Content-Type":"application/json",apikey:CFG.key,Authorization:"Bearer "+CFG.key},body:JSON.stringify(body)});
+    headers:Object.assign({"Content-Type":"application/json",apikey:CFG.key},/^eyJ/.test(CFG.key)?{Authorization:"Bearer "+CFG.key}:{}),body:JSON.stringify(body)});
   if(!r.ok) throw new Error(r.status);
   const txt=await r.text(); return txt?JSON.parse(txt):null;
 }
