@@ -1,0 +1,383 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Filipp's School Trainer</title>
+<script src="config.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Neucha&family=Nunito:wght@500;700;800;900&display=swap">
+<style>
+/* Layout: a squared exercise-book page. Top: name + two tabs (Learn / Parents). Learn = one card per trainer with today's numbers; opening a card fills the screen with that trainer and a slim bar back home. Parents = per-trainer report built from the synced progress. */
+:root{
+  --paper:#fbfcf8; --grid:#dfe7f0; --ink:#1f2b4a; --soft:#5b6785; --pen:#2b54c9; --card:#ffffff; --edge:#cdd8e6;
+  --ok:#1f8a4c; --ok-bg:#e3f3e8; --warn:#a86c12; --warn-bg:#fbf0dc; --bad:#c8372d; --bad-bg:#fbe5e2;
+  --display:"Neucha","Comic Sans MS",cursive; --body:"Nunito",system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#16202e; --grid:#202e45; --ink:#e7ecf5; --soft:#97a3bb; --pen:#86a7ff; --card:#1d293b; --edge:#33445e;
+  --ok:#5cc98a; --ok-bg:#183326; --warn:#e7b04f; --warn-bg:#352a14; --bad:#ff7b70; --bad-bg:#3a1d1c; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#16202e; --grid:#202e45; --ink:#e7ecf5; --soft:#97a3bb; --pen:#86a7ff; --card:#1d293b; --edge:#33445e;
+  --ok:#5cc98a; --ok-bg:#183326; --warn:#e7b04f; --warn-bg:#352a14; --bad:#ff7b70; --bad-bg:#3a1d1c; color-scheme:dark}
+html,body{height:100%}
+body{background-color:var(--paper);background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:22px 22px;color:var(--ink);font-family:var(--body);font-size:16px}
+.page{max-width:760px;margin:0 auto;padding-block:20px 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  display:flex;flex-direction:column;gap:18px}
+h1{font-family:var(--display);font-weight:400;font-size:2.2rem;line-height:1.05;margin:0;color:var(--pen);text-wrap:balance}
+h1 small,.ru{color:var(--soft);font-weight:600}
+h1 small{display:block;font-family:var(--body);font-size:.95rem;margin-top:4px}
+h2{font-family:var(--display);font-weight:400;font-size:1.6rem;margin:0}
+.ru{font-size:.88em}
+.top{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;justify-content:space-between}
+.tabs{display:flex;gap:6px;background:var(--card);border:2px solid var(--edge);border-radius:12px;padding:4px}
+.tabs button{font:800 .95rem var(--body);color:var(--soft);background:none;border:0;border-radius:8px;padding:8px 12px;cursor:pointer;line-height:1.15;text-align:left}
+.tabs button span{display:block;font-weight:600;font-size:.8em}
+.tabs button[aria-pressed="true"]{background:var(--pen);color:var(--paper)}
+.tabs button[aria-pressed="true"] span{color:inherit;opacity:.85}
+button:focus-visible,a:focus-visible{outline:3px solid var(--pen);outline-offset:2px}
+
+.today{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:baseline;font-weight:700}
+.today b{font-family:var(--display);font-weight:400;font-size:2rem;color:var(--pen);font-variant-numeric:tabular-nums}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
+.tcard{display:flex;flex-direction:column;gap:10px;text-align:left;background:var(--card);border:2px solid var(--edge);border-bottom-width:5px;border-radius:16px;
+  padding:14px 16px;cursor:pointer;color:var(--ink);font:inherit;text-decoration:none;min-width:0}
+.tcard:hover{border-color:var(--pen)}
+.tcard:active{transform:translateY(2px);border-bottom-width:3px}
+.thead{display:flex;gap:12px;align-items:center}
+.flag{width:38px;height:28px;border-radius:5px;overflow:hidden;display:flex;flex-direction:column;flex:none;border:2px solid var(--ink)}
+.flag i{flex:1}
+.flag.math{flex-direction:row;align-items:center;justify-content:center;background:var(--pen);color:var(--paper);font:900 1rem var(--body)}
+.tname{font-family:var(--display);font-size:1.5rem;line-height:1.05}
+.tname small{display:block;font-family:var(--body);font-size:.6em;color:var(--soft);font-weight:700}
+.tsub{font-size:.85rem;color:var(--soft);font-weight:700}
+.tstats{display:flex;gap:14px;flex-wrap:wrap;font-size:.85rem;color:var(--soft);font-weight:700}
+.tstats b{display:block;color:var(--ink);font-size:1.2rem;font-variant-numeric:tabular-nums}
+.tgo{font-weight:900;color:var(--pen)}
+.ext{font-size:.8rem;color:var(--warn);font-weight:800}
+.sync{font-size:.85rem;color:var(--soft);line-height:1.45;margin:0}
+.sync b{color:var(--ink)}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--soft);margin-right:6px;vertical-align:middle}
+.dot.on{background:var(--ok)} .dot.off{background:var(--warn)}
+
+.rep{display:flex;flex-direction:column;gap:14px}
+.rcard{background:var(--card);border:2px solid var(--edge);border-radius:16px;padding:14px 16px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.rhead{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:baseline}
+.pill{font-size:.78rem;font-weight:800;border-radius:999px;padding:3px 10px;white-space:nowrap}
+.pill.ok{background:var(--ok-bg);color:var(--ok)} .pill.warn{background:var(--warn-bg);color:var(--warn)} .pill.bad{background:var(--bad-bg);color:var(--bad)} .pill.none{border:1.5px dashed var(--edge);color:var(--soft)}
+.nums{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.nums div{background:var(--paper);border-radius:10px;padding:8px 10px;font-size:.78rem;color:var(--soft);font-weight:700;line-height:1.25}
+.nums b{display:block;color:var(--ink);font-size:1.35rem;font-variant-numeric:tabular-nums}
+.bars{display:flex;align-items:flex-end;gap:4px;height:70px}
+.bars div{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%;gap:3px}
+.bars i{display:block;width:100%;max-width:22px;border-radius:3px 3px 0 0;background:var(--pen);min-height:0}
+.bars i.zero{background:var(--edge);height:2px!important}
+.bars span{font-size:.62rem;color:var(--soft);font-weight:800}
+.label{font-size:.74rem;letter-spacing:.06em;text-transform:uppercase;color:var(--soft);font-weight:800}
+.skills{display:flex;flex-direction:column;gap:6px}
+.sk{display:grid;grid-template-columns:minmax(0,9rem) 1fr 3rem;gap:10px;align-items:center;font-size:.9rem;font-weight:700}
+.sk span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.skt{height:10px;background:var(--paper);border-radius:5px;overflow:hidden}
+.skt i{display:block;height:100%;border-radius:5px}
+.sk b{text-align:right;font-variant-numeric:tabular-nums}
+.tricky{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px}
+.tricky li{display:flex;justify-content:space-between;gap:10px;font-size:.92rem;border-top:1px dashed var(--edge);padding-top:4px}
+.tricky li span{min-width:0;overflow-wrap:anywhere}
+.tricky em{font-style:normal;font-weight:800;color:var(--bad);white-space:nowrap;font-variant-numeric:tabular-nums}
+.empty{color:var(--soft);font-weight:700;margin:0;font-size:.92rem}
+@media (max-width:520px){.nums{grid-template-columns:repeat(2,minmax(0,1fr))}.sk{grid-template-columns:minmax(0,7rem) 1fr 2.6rem}}
+
+/* full-screen trainer */
+#player{position:fixed;inset:0;z-index:20;display:flex;flex-direction:column;background:var(--paper);
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+#player[hidden]{display:none!important}
+.pbar{display:flex;align-items:center;gap:10px;padding-block:6px;padding-left:max(10px,env(safe-area-inset-left,0px));padding-right:max(10px,env(safe-area-inset-right,0px));
+  background:var(--card);border-bottom:2px solid var(--edge);font-weight:800;font-size:.9rem}
+.pbar button{font:800 .9rem var(--body);color:var(--pen);background:none;border:2px solid var(--pen);border-radius:10px;padding:5px 12px;cursor:pointer}
+.pbar .pt{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pbar .ps{color:var(--soft);font-size:.78rem;white-space:nowrap}
+#frame{flex:1;width:100%;border:0;background:#fff}
+@media (prefers-reduced-motion:reduce){.tcard:active{transform:none}}
+</style>
+</head><body>
+
+<div class="page" id="hub">
+  <header class="top">
+    <h1>Hi, Filipp!<small>Тренажёр Филиппа · школьные предметы</small></h1>
+    <nav class="tabs" aria-label="View">
+      <button id="tabLearn" aria-pressed="true">Learn<span>Заниматься</span></button>
+      <button id="tabParent" aria-pressed="false">Parents<span>Родителям</span></button>
+    </nav>
+  </header>
+
+  <section id="learn" style="display:flex;flex-direction:column;gap:16px">
+    <div class="today" id="today"></div>
+    <div class="cards" id="cards"></div>
+  </section>
+
+  <section id="parent" hidden style="display:flex;flex-direction:column;gap:14px">
+    <h2>Прогресс Филиппа <span class="ru">· Progress</span></h2>
+    <p class="sync">Данные приходят со всех устройств, где Филипп занимается через эту страницу. Сверху — сводка, ниже — навыки (слабые первыми) и слова, в которых он чаще ошибается.</p>
+    <div class="rep" id="rep"></div>
+  </section>
+
+  <p class="sync" id="syncNote"><span class="dot"></span>Connecting… · Подключение…</p>
+</div>
+
+<div id="player" hidden>
+  <div class="pbar">
+    <button id="close">← Home · Домой</button>
+    <span class="pt" id="ptitle"></span>
+    <span class="ps" id="psync"></span>
+  </div>
+  <iframe id="frame" title="Trainer" allow="autoplay"></iframe>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const LS={get(k){try{return localStorage.getItem(k)}catch(e){return null}},
+  set(k,v){try{v==null?localStorage.removeItem(k):localStorage.setItem(k,v)}catch(e){}}};
+
+const SKILLS_DE={words:"Word quiz",spell:"Spelling",hoeren:"Listening",lesen:"Reading",artikel:"der · das · die",verbs:"Verb forms",praep:"aus / in",dialog:"Questions & answers",caps:"Capital letters",num:"Numbers",datum:"Dates",abc:"Alphabet",satz:"Sentences"};
+const SKILLS_NL=Object.assign({},SKILLS_DE,{artikel:"de · het"});
+const TR=[
+  {id:"de",name:"German",ru:"Немецкий",sub:"Start + Lektion 1",file:"trainers/german.html",keys:["philipp-de"],skills:SKILLS_DE,flag:["#1d1d1d","#dd0000","#ffce00"]},
+  {id:"nl",name:"Dutch",ru:"Нидерландский",sub:"DISK Thema 2 · Op school",file:"trainers/dutch.html",keys:["filipp-nl"],skills:SKILLS_NL,flag:["#ae1c28","#ffffff","#21468b"]},
+  {id:"math",name:"Maths",ru:"Математика",sub:"MYP 1 + Year 6 · theory, tasks, times tables",file:"trainers/math-check.html",keys:["fd-answers","fd-psess","fd-drill","fd-pxp","fd-school","fd-focus"]}
+];
+/* maths check: question id prefix → topic */
+const MT={i:"Целые числа",b:"Порядок действий",h:"НОД и НОК",v:"Признаки делимости",p:"Разряды и округление",o:"Четыре действия",f:"Делители и простые",fr:"Дроби",d:"Десятичные",c:"Проценты",r:"Пропорции",n:"Отрицательные числа",m:"Измерения",g:"Геометрия",s:"Статистика",a:"Алгебра"};
+const MATH_CHECK_TOTAL=72;
+
+/* ---------- dates ---------- */
+const pad=n=>String(n).padStart(2,"0");
+const dayKey=d=>d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
+const ago=n=>{const d=new Date(); d.setDate(d.getDate()-n); return d;};
+function fmtDay(k){ if(!k) return "—"; const t=dayKey(new Date()), y=dayKey(ago(1)); if(k===t) return "сегодня"; if(k===y) return "вчера";
+  const [Y,M,D]=k.split("-").map(Number); return new Date(Y,M-1,D).toLocaleDateString("ru-RU",{day:"numeric",month:"short"}); }
+
+/* ---------- sync between this browser and the shared store ---------- */
+let db=null, dbState="wait", lastSync=0, current=null;
+const remote={};
+const snap=t=>{const o={}; t.keys.forEach(k=>o[k]=LS.get(k)); return o;};
+const meta=id=>{try{return JSON.parse(LS.get("hub-sync-"+id))||{}}catch(e){return {}}};
+const setMeta=(id,m)=>LS.set("hub-sync-"+id,JSON.stringify(m));
+const isEmpty=o=>Object.values(o).every(v=>v==null);
+
+/* family code: arrives once in the link (#k=...), then is remembered on this device */
+(function(){ const m=/[#&]k=([A-Za-z0-9_-]{20,80})/.exec(location.hash);
+  if(m){ LS.set("hub-code",m[1]); history.replaceState(null,"",location.pathname+location.search); } })();
+const CODE=LS.get("hub-code");
+const CFG=window.SYNC||{};
+/* Supabase: two database functions guard the table, so only someone with the code can read or write */
+async function rpc(fn,body){
+  const r=await fetch(CFG.url.replace(/\/$/,"")+"/rest/v1/rpc/"+fn,{method:"POST",
+    headers:{"Content-Type":"application/json",apikey:CFG.key,Authorization:"Bearer "+CFG.key},body:JSON.stringify(body)});
+  if(!r.ok) throw new Error(r.status);
+  const txt=await r.text(); return txt?JSON.parse(txt):null;
+}
+
+function pull(t){
+  const r=remote[t.id]; if(!r||!r.keys||current===t) return false;
+  const m=meta(t.id), local=snap(t), h=JSON.stringify(local);
+  if((r.updatedAt||0)<=(m.at||0)) return false;
+  let dirty = m.h!==undefined ? h!==m.h : !isEmpty(local);
+  // first sync on a device that already has its own progress: keep whichever has more
+  if(m.h===undefined && dirty && JSON.stringify(r.keys).length>h.length) dirty=false;
+  if(dirty) return false;
+  t.keys.forEach(k=>LS.set(k,r.keys[k]??null));
+  setMeta(t.id,{at:r.updatedAt,h:JSON.stringify(snap(t))});
+  return true;
+}
+const busy={};
+async function push(t){
+  if(!db||!t.keys.length||busy[t.id]) return;
+  const s=snap(t), h=JSON.stringify(s), m=meta(t.id);
+  if(h===m.h||isEmpty(s)) return;
+  if(h.length>450000){ dbState="big"; note(); return; }
+  busy[t.id]=true; const at=Date.now();
+  try{ await rpc("save_progress",{p_code:CODE,p_subject:t.id,p_keys:s,p_at:at}); setMeta(t.id,{at,h}); remote[t.id]={keys:s,updatedAt:at}; lastSync=at; dbState="on"; }
+  catch(e){ dbState="err"; }
+  finally{ busy[t.id]=false; note(); }
+}
+const pushAll=()=>TR.forEach(push);
+let pushTimer=null;
+window.addEventListener("storage",()=>{ clearTimeout(pushTimer); pushTimer=setTimeout(pushAll,1500); });
+setInterval(()=>{ pushAll(); if(current) note(); },15000);
+document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="hidden") pushAll(); else fetchRemote(); });
+
+async function fetchRemote(){
+  if(!db) return;
+  try{
+    const rows=await rpc("get_progress",{p_code:CODE})||[];
+    rows.forEach(r=>{ remote[r.subject]={keys:r.keys,updatedAt:Number(r.updated_at)}; });
+    dbState="on"; TR.forEach(pull); render();
+  }catch(e){ dbState="err"; }
+  note();
+}
+async function initDb(){
+  if(!CFG.url||!CFG.key){ dbState="nocfg"; note(); return; }
+  if(!CODE){ dbState="nocode"; note(); return; }
+  db=true;
+  await fetchRemote();
+  setInterval(()=>{ if(!current) fetchRemote(); },60000);
+  setTimeout(pushAll,2500);
+}
+
+function note(){
+  const el=$("syncNote"), ps=$("psync");
+  const t=lastSync?new Date(lastSync).toLocaleTimeString("ru-RU",{hour:"2-digit",minute:"2-digit"}):"";
+  const txt={
+    wait:`<span class="dot"></span>Connecting… · Подключение…`,
+    on:`<span class="dot on"></span><b>Progress is saved online</b> and shows up on every device with the family link. · Прогресс сохраняется онлайн и виден на всех устройствах с семейной ссылкой.${t?` Last save ${t}.`:""}`,
+    nocfg:`<span class="dot off"></span><b>Progress is saved in this browser.</b> · Прогресс сохраняется в этом браузере.`,
+    nocode:`<span class="dot off"></span><b>Progress is saved in this browser only.</b> Open the family link once on this device to share it. · Прогресс сохраняется только в этом браузере — откройте семейную ссылку один раз на этом устройстве.`,
+    err:`<span class="dot off"></span><b>No connection to the progress server.</b> Progress is kept in this browser and will be sent later. · Нет связи с сервером, прогресс сохранён в браузере и отправится позже.`,
+    big:`<span class="dot off"></span>Progress is too large to save online; it stays on this device. · Прогресс слишком большой для сохранения онлайн.`
+  }[dbState];
+  el.innerHTML=txt;
+  ps.textContent=dbState==="on"?(t?"saved "+t:"saving on"):dbState==="wait"?"":dbState==="err"?"offline":"this device only";
+}
+
+/* ---------- reading a trainer's progress ---------- */
+function rawOf(t,k){
+  const r=remote[t.id], useR=current!==t&&r&&r.keys&&(r.updatedAt||0)>(meta(t.id).at||0);
+  return useR?r.keys[k]:LS.get(k);
+}
+function J(t,k){ const raw=rawOf(t,k); try{ return raw?JSON.parse(raw):null; }catch(e){ return null; } }
+function summary(t){ return t.id==="math"?mathSummary(t):langSummary(t); }
+function langSummary(t){
+  const S=J(t,t.keys[0]); if(!S) return null;
+  const days=S.days||{}, today=dayKey(new Date());
+  let total=0, ok=0, week=0, weekOk=0, lastDay="";
+  Object.entries(days).forEach(([k,d])=>{ total+=d.q||0; ok+=d.ok||0; if((d.q||0)>0&&k>lastDay) lastDay=k; });
+  const last14=[]; for(let i=13;i>=0;i--){ const k=dayKey(ago(i)), d=days[k]||{q:0,ok:0}; last14.push({k,q:d.q||0,ok:d.ok||0}); if(i<7){ week+=d.q||0; weekOk+=d.ok||0; } }
+  const alive=S.last===new Date().toDateString()||S.last===ago(1).toDateString();
+  const skills=Object.entries(S.types||{}).filter(([,v])=>v.q>=3).map(([k,v])=>({k,name:t.skills[k]||k,q:v.q,p:Math.round(v.ok/v.q*100)})).sort((a,b)=>a.p-b.p);
+  const tricky=Object.values(S.items||{}).filter(x=>x.w>0&&x.w>x.r-1).sort((a,b)=>(b.w-b.r*.5)-(a.w-a.r*.5)).slice(0,8);
+  return {xp:S.xp||0,streak:alive?(S.streak||0):0,today:(days[today]||{}).q||0,total,ok,week,weekOk,lastDay,last14,skills,tricky,rounds:S.rounds||0};
+}
+
+/* maths stores dates as UTC YYYY-MM-DD, so count its days the same way */
+const utcKey=d=>d.toISOString().slice(0,10);
+function mathSummary(t){
+  const A=J(t,"fd-answers")||{}, P=J(t,"fd-psess")||[], D=J(t,"fd-drill")||{}, DS=D.sessions||[];
+  const ids=Object.keys(A);
+  if(!ids.length&&!P.length&&!DS.length) return null;
+  let xp=+J(t,"fd-pxp")||0, chkN=0, chkOk=0; const ct={};
+  ids.forEach(id=>{ const a=A[id], m=/^([a-z]+)\d+$/.exec(id), k=m&&m[1]; if(!a||!MT[k]) return;
+    if(a.ok) xp+=10; else if(a.retry&&a.retry.ok) xp+=5;
+    chkN++; if(a.ok) chkOk++; const c=ct[k]=ct[k]||{q:0,ok:0}; c.q++; if(a.ok) c.ok++; });
+  const days={}, add=(d,q,ok)=>{ if(!d) return; const x=days[d]=days[d]||{q:0,ok:0}; x.q+=q; x.ok+=ok; };
+  P.forEach(s=>add(s.date,s.total||0,s.right||0)); DS.forEach(s=>add(s.date,s.count||0,s.right||0));
+  const today=utcKey(new Date());
+  let total=0, ok=0, week=0, weekOk=0, lastDay="";
+  Object.entries(days).forEach(([k,d])=>{ total+=d.q; ok+=d.ok; if(d.q&&k>lastDay) lastDay=k; });
+  const last14=[]; for(let i=13;i>=0;i--){ const k=utcKey(ago(i)), d=days[k]||{q:0,ok:0}; last14.push({k,q:d.q,ok:d.ok}); if(i<7){ week+=d.q; weekOk+=d.ok; } }
+  let streak=0; for(let i=days[today]?0:1;i<400&&days[utcKey(ago(i))];i++) streak++;
+  const by={}; P.forEach(s=>{ const l=s.label||"Тренировка", g=by[l]=by[l]||{name:l,q:0,ok:0,n:0}; g.q+=s.total||0; g.ok+=s.right||0; g.n++; });
+  const skills=Object.values(by).filter(g=>g.q).map(g=>({k:g.name,name:`${g.name} (${g.n}×)`,q:g.q,p:Math.round(g.ok/g.q*100)})).sort((a,b)=>a.p-b.p);
+  const check=Object.entries(ct).map(([k,c])=>({name:MT[k],q:c.q,ok:c.ok,p:Math.round(c.ok/c.q*100)})).sort((a,b)=>a.p-b.p);
+  const mist=[]; P.slice(-12).reverse().forEach(s=>(s.mist||[]).forEach(m=>mist.length<8&&mist.push({l:`${m.q} — ответ ${m.a}, верно ${m.r}`,d:s.date})));
+  const facts=Object.entries(D.facts||{}).filter(([,v])=>v.wrong>0).sort((a,b)=>b[1].wrong-a[1].wrong).slice(0,8)
+    .map(([k,v])=>({l:`${k} = ${(k.match(/\d+/g)||[]).reduce((a,b)=>a*b,1)}`,w:v.wrong,r:Math.max(0,(v.seen||0)-v.wrong)}));
+  return {xp,streak,today:(days[today]||{}).q||0,total,ok,week,weekOk,lastDay,last14,skills,rounds:P.length+DS.length,
+    check,chkN,chkOk,mist,facts,drills:DS.length};
+}
+
+/* ---------- views ---------- */
+function flag(t){ return t.flag?`<span class="flag">${t.flag.map(c=>`<i style="background:${c}"></i>`).join("")}</span>`:`<span class="flag math">×÷</span>`; }
+function render(){
+  const sums=TR.map(t=>t.keys.length?summary(t):null);
+  const todayAll=sums.reduce((a,s)=>a+(s?s.today:0),0);
+  $("today").innerHTML=`<span><b>${todayAll}</b> questions today · задач сегодня</span>`;
+  $("cards").innerHTML=TR.map((t,i)=>{
+    const s=sums[i];
+    const head=`<span class="thead">${flag(t)}<span class="tname">${esc(t.name)}<small>${esc(t.ru)}</small></span></span><span class="tsub">${esc(t.sub)}</span>`;
+    if(t.url) return `<a class="tcard" href="${t.url}" target="_blank" rel="noopener">${head}
+      <span class="ext">Opens separately for now · пока открывается отдельно, прогресс не попадает в отчёт</span><span class="tgo">Open →</span></a>`;
+    return `<button class="tcard" data-open="${t.id}">${head}
+      <span class="tstats"><span><b>${s?s.today:0}</b>today</span><span><b>${s?s.streak:0}</b>days in a row</span><span><b>${s?s.xp:0}</b>coins</span></span>
+      <span class="tgo">${s&&s.total?"Continue →":"Start →"}</span></button>`;
+  }).join("");
+  document.querySelectorAll("[data-open]").forEach(b=>b.onclick=()=>openT(TR.find(t=>t.id===b.dataset.open)));
+  renderReport(sums);
+}
+function verdict(p){ return p>=85?["ok","хорошо"]:p>=60?["warn","повторить"]:["bad","слабо"]; }
+function barsHtml(l14){
+  const max=Math.max(5,...l14.map(d=>d.q));
+  return l14.map((d,j)=>`<div title="${fmtDay(d.k)}: ${d.q} ответов${d.q?`, верно ${d.ok}`:""}"><i class="${d.q?"":"zero"}" style="height:${d.q/max*100}%"></i><span>${j===13?"сег":Number(d.k.slice(8,10))}</span></div>`).join("");
+}
+const skillRows=list=>list.map(k=>{const [c]=verdict(k.p);return `<div class="sk"><span>${esc(k.name)}</span><div class="skt"><i style="width:${k.p}%;background:var(--${c})"></i></div><b>${k.p}%</b></div>`;}).join("");
+function mathReport(t,s){
+  const head=extra=>`<div class="rhead"><span class="tname">${esc(t.ru)} <small>${esc(t.name)}${extra||""}</small></span>`;
+  if(!s) return `<div class="rcard">${head()}<span class="pill none">не начато</span></div>
+    <p class="empty">Пока нет ответов. Здесь появятся данные, как только Филипп решит первые задания.</p></div>`;
+  const acc=s.total?Math.round(s.ok/s.total*100):null, wacc=s.week?Math.round(s.weekOk/s.week*100):null;
+  const [vc,vt]=acc!=null?verdict(acc):["none","только проверка"];
+  const chk=s.chkN?`<p class="empty" style="font-style:normal">Отвечено ${s.chkN} из ${MATH_CHECK_TOTAL}, верно ${s.chkOk} (${Math.round(s.chkOk/s.chkN*100)}%).${s.chkN<MATH_CHECK_TOTAL?" Проверка ещё не закончена.":""}</p>
+      <div class="skills">${skillRows(s.check.map(c=>({name:`${c.name} · ${c.ok}/${c.q}`,p:c.p})))}</div>`:`<p class="empty">Проверку ещё не начинал.</p>`;
+  const mist=s.mist.length?`<ul class="tricky">${s.mist.map(x=>`<li><span>${esc(x.l)}</span><em>${fmtDay(x.d)}</em></li>`).join("")}</ul>`:`<p class="empty">Ошибок в тренировках пока нет.</p>`;
+  const facts=s.facts.length?`<div class="label">Таблица умножения: трудные примеры</div><ul class="tricky">${s.facts.map(x=>`<li><span>${esc(x.l)}</span><em>✗ ${x.w} · ✓ ${x.r}</em></li>`).join("")}</ul>`:"";
+  return `<div class="rcard">
+    ${head(` · последнее занятие: ${fmtDay(s.lastDay)}`)}<span class="pill ${vc}">${acc!=null?`${acc}% верно · ${vt}`:vt}</span></div>
+    <div class="nums"><div><b>${s.week}</b>ответов за 7 дней${wacc!=null?`, ${wacc}% верно`:""}</div><div><b>${s.total}</b>ответов в тренировках</div><div><b>${s.streak}</b>дней подряд</div><div><b>${s.rounds}</b>тренировок, из них ${s.drills} на таблицу</div></div>
+    <div class="label">Последние 14 дней</div><div class="bars">${barsHtml(s.last14)}</div>
+    <div class="label">Тренировки по темам · слабые сверху</div><div class="skills">${s.skills.length?skillRows(s.skills):`<p class="empty">Тренировок по темам ещё не было.</p>`}</div>
+    <div class="label">Проверка знаний (MYP 1 + Year 6)</div>${chk}
+    <div class="label">Последние ошибки в тренировках</div>${mist}
+    ${facts}
+    <p class="empty">Подробный разбор каждой ошибки проверки — внутри тренажёра: «Report for parents».</p>
+  </div>`;
+}
+function renderReport(sums){
+  $("rep").innerHTML=TR.map((t,i)=>{
+    const s=sums[i];
+    if(t.id==="math") return mathReport(t,s);
+    if(!s||!s.total) return `<div class="rcard"><div class="rhead"><span class="tname">${esc(t.ru)} <small>${esc(t.name)}</small></span><span class="pill none">не начато</span></div>
+      <p class="empty">Пока нет ответов. Здесь появятся данные, как только Филипп решит первые задания.</p></div>`;
+    const acc=Math.round(s.ok/s.total*100), wacc=s.week?Math.round(s.weekOk/s.week*100):null, [vc,vt]=verdict(acc);
+    const bars=barsHtml(s.last14);
+    const skills=s.skills.length?skillRows(s.skills):`<p class="empty">Нужно больше ответов, чтобы увидеть навыки.</p>`;
+    const tricky=s.tricky.length?`<ul class="tricky">${s.tricky.map(x=>`<li><span>${esc(x.l)}</span><em>✗ ${x.w} · ✓ ${x.r}</em></li>`).join("")}</ul>`:`<p class="empty">Повторяющихся ошибок нет.</p>`;
+    return `<div class="rcard">
+      <div class="rhead"><span class="tname">${esc(t.ru)} <small>${esc(t.name)} · последнее занятие: ${fmtDay(s.lastDay)}</small></span><span class="pill ${vc}">${acc}% верно · ${vt}</span></div>
+      <div class="nums"><div><b>${s.week}</b>ответов за 7 дней${wacc!=null?`, ${wacc}% верно`:""}</div><div><b>${s.total}</b>ответов всего</div><div><b>${s.streak}</b>дней подряд</div><div><b>${s.rounds}</b>раундов сыграно</div></div>
+      <div class="label">Последние 14 дней</div><div class="bars">${bars}</div>
+      <div class="label">Навыки · слабые сверху</div><div class="skills">${skills}</div>
+      <div class="label">Чаще всего ошибается</div>${tricky}
+    </div>`;
+  }).join("");
+}
+
+/* ---------- open / close a trainer ---------- */
+const cache={};
+async function openT(t){
+  pull(t);
+  current=t;
+  $("ptitle").textContent=`${t.name} · ${t.ru}`;
+  $("player").hidden=false; $("hub").hidden=true; note();
+  const fr=$("frame");
+  try{
+    if(!cache[t.id]){ const r=await fetch(t.file); if(!r.ok) throw new Error(r.status); cache[t.id]=await r.text(); }
+    fr.srcdoc=cache[t.id];
+  }catch(e){
+    fr.srcdoc=`<p style="font:16px system-ui;padding:20px">Could not load the trainer. Check the connection and try again. · Не удалось загрузить тренажёр, проверьте соединение.</p>`;
+  }
+}
+function closeT(){
+  const t=current; current=null;
+  $("frame").srcdoc=""; $("player").hidden=true; $("hub").hidden=false;
+  if(t) push(t);
+  render(); note();
+}
+$("close").onclick=closeT;
+
+/* ---------- tabs ---------- */
+function tab(p){ $("tabLearn").setAttribute("aria-pressed",String(!p)); $("tabParent").setAttribute("aria-pressed",String(p)); $("learn").hidden=p; $("parent").hidden=!p;
+  try{ sessionStorage.setItem("hub-tab",p?"parent":"learn"); }catch(e){} }
+$("tabLearn").onclick=()=>tab(false); $("tabParent").onclick=()=>tab(true);
+try{ if(sessionStorage.getItem("hub-tab")==="parent") tab(true); }catch(e){}
+
+render(); note(); initDb();
+</script>
+</body></html>
