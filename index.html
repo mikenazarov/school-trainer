@@ -45,6 +45,7 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--pen);outline-offset
 .thead{display:flex;gap:12px;align-items:center}
 .flag{width:38px;height:28px;border-radius:5px;overflow:hidden;display:flex;flex-direction:column;flex:none;border:2px solid var(--ink)}
 .flag i{flex:1}
+.flag.v{flex-direction:row}
 .flag.math{flex-direction:row;align-items:center;justify-content:center;background:var(--pen);color:var(--paper);font:900 1rem var(--body)}
 .tname{font-family:var(--display);font-size:1.5rem;line-height:1.05}
 .tname small{display:block;font-family:var(--body);font-size:.6em;color:var(--soft);font-weight:700}
@@ -139,9 +140,11 @@ const LS={get(k){try{return localStorage.getItem(k)}catch(e){return null}},
 
 const SKILLS_DE={words:"Word quiz",spell:"Spelling",hoeren:"Listening",lesen:"Reading",artikel:"der · das · die",verbs:"Verb forms",praep:"aus / in",dialog:"Questions & answers",caps:"Capital letters",num:"Numbers",datum:"Dates",abc:"Alphabet",satz:"Sentences"};
 const SKILLS_NL=Object.assign({},SKILLS_DE,{artikel:"de · het"});
+const SKILLS_FR={words:"Word quiz",spell:"Spelling",hoeren:"Listening",lesen:"Reading",artikel:"le · la · les / un · une",verbs:"Verb forms",praep:"mon · ma · mes",dialog:"Questions & answers",caps:"Colour agreement",neg:"ne … pas",num:"Numbers",datum:"Days & dates",abc:"Alphabet",satz:"Sentences"};
 const TR=[
   {id:"de",name:"German",ru:"Немецкий",sub:"Start + Lektion 1",file:"trainers/german.html",keys:["philipp-de"],skills:SKILLS_DE,flag:["#1d1d1d","#dd0000","#ffce00"]},
   {id:"nl",name:"Dutch",ru:"Нидерландский",sub:"DISK Thema 2 · Op school",file:"trainers/dutch.html",keys:["filipp-nl"],skills:SKILLS_NL,flag:["#ae1c28","#ffffff","#21468b"]},
+  {id:"fr",name:"French",ru:"Французский",sub:"Notebook Sept – Nov",file:"trainers/french.html",keys:["filipp-fr"],skills:SKILLS_FR,flag:["#0055a4","#ffffff","#ef4135"]},
   {id:"math",name:"Maths",ru:"Математика",sub:"MYP 1 + Year 6 · theory, tasks, times tables",file:"trainers/math-check.html",keys:["fd-answers","fd-psess","fd-drill","fd-pxp","fd-school","fd-focus"]}
 ];
 /* maths check: question id prefix → topic */
@@ -285,7 +288,7 @@ function mathSummary(t){
 }
 
 /* ---------- views ---------- */
-function flag(t){ return t.flag?`<span class="flag">${t.flag.map(c=>`<i style="background:${c}"></i>`).join("")}</span>`:`<span class="flag math">×÷</span>`; }
+function flag(t){ return t.flag?`<span class="flag${t.id==="fr"?" v":""}">${t.flag.map(c=>`<i style="background:${c}"></i>`).join("")}</span>`:`<span class="flag math">×÷</span>`; }
 function render(){
   const sums=TR.map(t=>t.keys.length?summary(t):null);
   const todayAll=sums.reduce((a,s)=>a+(s?s.today:0),0);

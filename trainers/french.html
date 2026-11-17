@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Filipp's French Trainer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1b1b2f; --muted:#5b5872; --card:#ffffff; --line:#1b1b2f;
+  --der:#2f7bff; --das:#14b86a; --die:#ff3d5a; --ok:#14b86a; --bad:#ff3d5a; --accent:#ff7a1a;
+  --sh:4px 4px 0 var(--ink);
+}
+*{box-sizing:border-box}
+html,body{margin:0;color:var(--ink);font-family:Nunito,system-ui,sans-serif;font-size:17px;font-weight:700}
+body{min-height:100vh;background:#e6f3fb radial-gradient(circle at 1px 1px,rgba(27,27,47,.07) 1.5px,transparent 0) 0 0/22px 22px;}
+body::before{content:"";position:fixed;inset:0;z-index:-1;background:linear-gradient(170deg,#f2f9fd 0%,#e3f1fa 55%,#d6eaf6 100%)}
+button{font-family:inherit;font-size:inherit;color:inherit;cursor:pointer}
+.wrap{max-width:740px;margin:0 auto;padding:16px 16px 60px}
+header{display:flex;align-items:center;gap:12px;margin-bottom:8px;flex-wrap:wrap}
+.flag{width:40px;height:30px;border-radius:7px;overflow:hidden;display:flex;flex-direction:column;flex:none;border:3px solid var(--ink);box-shadow:3px 3px 0 var(--ink);transform:rotate(-6deg)}
+.flag{flex-direction:row!important}.flag i{flex:1}.flag i:nth-child(1){background:#0055a4}.flag i:nth-child(2){background:#fff}.flag i:nth-child(3){background:#ef4135}
+h1{font-family:"Lilita One",sans-serif;font-weight:400;font-size:1.9rem;line-height:1;margin:0;letter-spacing:.5px;text-shadow:3px 3px 0 #fff}
+h1 small{display:block;font-family:Nunito;font-size:.85rem;color:var(--ink);font-weight:800;text-shadow:none;margin-top:4px;opacity:.75}
+.stats{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+.pill{background:#fff;border:3px solid var(--ink);border-radius:999px;padding:4px 11px;font-weight:900;white-space:nowrap;font-size:.95rem;box-shadow:3px 3px 0 var(--ink)}
+button.pill:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
+h2{font-family:"Lilita One",sans-serif;font-weight:400;font-size:1.45rem;margin:24px 0 10px;letter-spacing:.5px;color:var(--ink);text-shadow:3px 3px 0 #fff}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px}
+.tile{border:3px solid var(--ink);border-radius:20px;padding:14px;text-align:left;display:flex;gap:12px;align-items:center;box-shadow:var(--sh);transition:transform .12s}
+.tile:hover{transform:translate(-2px,-2px) rotate(-1deg);box-shadow:6px 6px 0 var(--ink)}
+.tile:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--ink)}
+.tile .ic{font-size:1.9rem;width:52px;height:52px;border-radius:16px;display:grid;place-items:center;flex:none;background:#fff!important;border:3px solid var(--ink)}
+.tile b{display:block;color:var(--ink);font-size:1.08rem;font-weight:900}
+.tile>span>span{display:block;font-size:.84rem;color:var(--ink);opacity:.75;font-weight:800}
+.tile .best{color:var(--ink);opacity:1!important;letter-spacing:2px;font-size:1rem!important}
+.tile.big{padding:18px}
+.tile.big b{font-family:"Lilita One";font-weight:400;font-size:1.45rem;letter-spacing:.5px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:3px solid var(--ink);background:#fff;border-radius:999px;padding:6px 13px;font-weight:900;box-shadow:3px 3px 0 var(--ink)}
+.chip.on{background:var(--ink);color:#ffe066}
+.chip:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.btn{border:3px solid var(--ink);border-radius:16px;padding:12px 20px;font-weight:900;background:var(--accent);color:#fff;box-shadow:var(--sh);font-size:1.05rem;text-shadow:1px 1px 0 rgba(0,0,0,.25)}
+.btn:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--ink)}
+.btn.ghost{background:#fff;color:var(--ink);text-shadow:none}
+.btn:disabled{opacity:.45}
+/* mascot */
+.hero{display:flex;align-items:flex-end;gap:10px;margin:6px 0 4px}
+.mascot{width:92px;height:92px;flex:none;animation:bob 2.4s ease-in-out infinite;cursor:pointer;filter:drop-shadow(3px 3px 0 var(--ink))}
+@keyframes bob{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-7px) rotate(3deg)}}
+.bubble{position:relative;background:#fff;border:3px solid var(--ink);border-radius:18px;padding:10px 14px;font-weight:900;box-shadow:var(--sh);margin-bottom:22px;font-size:1.02rem}
+.bubble::before{content:"";position:absolute;left:-14px;bottom:12px;border:8px solid transparent;border-right:12px solid var(--ink)}
+.bubble::after{content:"";position:absolute;left:-8px;bottom:14px;border:6px solid transparent;border-right:9px solid #fff}
+.lvl{display:flex;align-items:center;gap:10px;background:#fff;border:3px solid var(--ink);border-radius:16px;padding:8px 12px;box-shadow:var(--sh);margin-top:6px}
+.lvl b{font-family:"Lilita One";font-weight:400;font-size:1.15rem;white-space:nowrap}
+.lvl .bar{height:20px}
+.lvl .bar,.lvl .bar i{background-size:20px 20px}
+/* game */
+.top{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.x{border:3px solid var(--ink);background:#fff;font-size:1.1rem;font-weight:900;color:var(--ink);padding:4px 11px;border-radius:12px;box-shadow:3px 3px 0 var(--ink)}
+.bar{flex:1;height:24px;border:3px solid #4a4a4a;border-radius:0;overflow:hidden;background:#e9e9e9 var(--tex-bg) 0 0/24px 24px;image-rendering:pixelated}
+.bar i{display:block;height:100%;width:0;transition:width .4s steps(8,end);background:#7a5230 var(--tex-fill) 0 0/24px 100%;image-rendering:pixelated;border-right:2px solid #3b2a18}
+@keyframes stripe{to{background-position:34px 0}}
+.combo{font-family:"Lilita One";color:#fff;-webkit-text-stroke:1px var(--ink);text-shadow:2px 2px 0 var(--ink);font-size:1.3rem;min-width:52px;text-align:center}
+.q{background:#fff;border:3px solid var(--ink);border-radius:24px;padding:22px 18px;text-align:center;min-height:170px;display:flex;flex-direction:column;justify-content:center;gap:8px;box-shadow:6px 6px 0 var(--ink);animation:popin .35s cubic-bezier(.3,1.6,.5,1)}
+@keyframes popin{from{transform:scale(.85) rotate(-2deg);opacity:0}to{transform:none;opacity:1}}
+.hint{color:var(--muted);font-weight:900;font-size:.85rem;text-transform:uppercase;letter-spacing:.06em}
+.big{font-family:"Lilita One",sans-serif;font-weight:400;font-size:2.2rem;line-height:1.15;word-break:break-word;letter-spacing:.3px}
+.emoji{font-size:3.2rem;line-height:1;animation:wig 3s ease-in-out infinite}
+@keyframes wig{0%,90%,100%{transform:rotate(0)}93%{transform:rotate(-12deg)}96%{transform:rotate(10deg)}}
+.say{border:3px solid var(--ink);background:#b8a8ff;color:var(--ink);border-radius:999px;padding:6px 16px;font-weight:900;align-self:center;box-shadow:3px 3px 0 var(--ink)}
+.say:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.opt{background:#fff;border:3px solid var(--ink);border-radius:18px;padding:15px 10px;font-weight:900;font-size:1.1rem;box-shadow:var(--sh);transition:transform .1s}
+.opt:hover{transform:translate(-1px,-1px)}
+.opt:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--ink)}
+.opt.ok{background:#7cf0b0;animation:jump .4s}
+.opt.bad{background:#ff9aa8;animation:shake .4s}
+@keyframes jump{40%{transform:translateY(-8px) scale(1.04)}}
+@keyframes shake{20%,60%{transform:translateX(-7px)}40%,80%{transform:translateX(7px)}}
+.opts.three{grid-template-columns:1fr 1fr 1fr}
+.art{font-family:"Lilita One";font-weight:400;font-size:1.7rem;color:#fff;text-shadow:2px 2px 0 var(--ink);letter-spacing:1px}
+.art.le,.art.un{background:var(--der)} .art.la,.art.une{background:var(--die)} .art.les,.art.des{background:var(--das)}
+.art.ok{outline:4px solid #fff;outline-offset:-9px} .art.bad{opacity:.35}
+.inp{width:100%;font-size:1.4rem;padding:14px;border-radius:16px;border:3px solid var(--ink);font-family:inherit;font-weight:900;margin-top:16px;text-align:center;background:#fff;box-shadow:inset 0 3px 0 rgba(0,0,0,.08)}
+.inp:focus{outline:none;background:#fffbe0}
+.keys{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:12px}
+.key{border:3px solid var(--ink);background:#fff;border-radius:12px;width:48px;height:44px;font-weight:900;font-size:1.2rem;box-shadow:3px 3px 0 var(--ink)}
+.key:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
+.fb{margin-top:14px;border:3px solid var(--ink);border-radius:18px;padding:14px;font-weight:900;display:none;box-shadow:var(--sh);animation:popin .3s}
+.fb.ok{display:block;background:#7cf0b0;color:var(--ink)}
+.fb.bad{display:block;background:#ffd0d6;color:var(--ink)}
+.fb .ans{font-family:"Lilita One";font-weight:400;font-size:1.35rem;display:block;margin-top:4px;letter-spacing:.3px}
+.next{width:100%;margin-top:14px}
+.der-t{color:var(--der)} .das-t{color:var(--das)} .die-t{color:var(--die)}
+.card3d{perspective:900px;margin-top:6px}
+.flip{position:relative;height:260px;transition:transform .5s cubic-bezier(.3,1.4,.5,1);transform-style:preserve-3d;cursor:pointer}
+.flip.on{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;backface-visibility:hidden;background:#fff;border:3px solid var(--ink);border-radius:24px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:16px;text-align:center;box-shadow:6px 6px 0 var(--ink)}
+.face.back{transform:rotateY(180deg);background:#8ee3f0}
+.end{text-align:center;padding:10px 0}
+.end .stars{font-size:3.4rem;letter-spacing:6px;animation:popin .6s cubic-bezier(.3,1.6,.5,1)}
+.end h1{font-size:3rem}
+.cal{display:inline-block;background:#fff;border:3px solid var(--ink);border-radius:16px;overflow:hidden;min-width:170px;align-self:center;box-shadow:var(--sh);transform:rotate(-2deg)}
+.cal b{display:block;background:var(--die);color:#fff;padding:5px 12px;font-size:.95rem;border-bottom:3px solid var(--ink)}
+.cal div{font-family:"Lilita One";font-size:2.8rem;line-height:1.1;padding:4px 12px 0}
+.cal span{display:block;padding:0 12px 8px;font-weight:900;color:var(--muted)}
+.tip{background:rgba(255,255,255,.75);border:3px dashed var(--ink);border-radius:16px;padding:10px 14px;font-size:.92rem;color:var(--ink);font-weight:800;margin-top:14px}
+.why{margin-top:10px;padding-top:10px;border-top:3px dashed rgba(27,27,47,.25);font-weight:800;color:var(--ink);line-height:1.45}
+.why b{color:#c4122f}
+.pop{position:fixed;left:50%;top:38%;transform:translate(-50%,-50%) scale(.5);font-family:"Lilita One";font-size:3.2rem;color:#fff;-webkit-text-stroke:2px var(--ink);text-shadow:4px 4px 0 var(--ink);opacity:0;pointer-events:none;transition:all .35s cubic-bezier(.3,1.6,.5,1);z-index:50;white-space:nowrap}
+.pop.show{opacity:1;transform:translate(-50%,-80%) scale(1) rotate(-4deg)}
+.conf{position:fixed;top:-20px;width:11px;height:16px;z-index:40;pointer-events:none;border:2px solid var(--ink);border-radius:3px;animation:fall linear forwards}
+@keyframes fall{to{transform:translate(var(--dx),110vh) rotate(var(--r))}}
+.mute{font-size:.85rem;color:var(--ink);font-weight:800;margin-top:24px;text-align:center;opacity:.7}
+select.inp{font-size:1rem;text-align:left}
+input[type=range]{accent-color:var(--accent)}
+@media (max-width:480px){.big{font-size:1.8rem}.opts{grid-template-columns:1fr}.opts.three{grid-template-columns:1fr 1fr 1fr}h1{font-size:1.5rem}.mascot{width:74px;height:74px}}
+
+/* stats */
+.stg{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.st{background:#fff;border:3px solid var(--ink);border-radius:18px;padding:12px;text-align:center;box-shadow:var(--sh)}
+.sti{font-size:1.5rem}.stv{font-family:"Lilita One";font-size:1.9rem;line-height:1.1}.stl{font-size:.82rem;color:var(--muted);font-weight:800}
+.panel{background:#fff;border:3px solid var(--ink);border-radius:20px;padding:16px;box-shadow:var(--sh)}
+.sbars{display:flex;align-items:flex-end;gap:6px;height:170px}
+.sb{flex:1;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;cursor:pointer;padding:0 1px}
+.sb:hover .sbb{filter:brightness(1.1);outline:2px solid var(--ink)}
+.sbb{width:100%;max-width:26px;background:#5fa83a;border-radius:4px 4px 0 0;min-height:0}
+.sbv{font-size:.8rem;font-weight:900;color:var(--ink);height:16px}
+.sbl{font-size:.72rem;color:var(--muted);font-weight:800;margin-top:4px;border-top:2px solid #cfd6de;width:100%;text-align:center;padding-top:3px}
+.sbl.now{color:var(--ink)}
+.cap{font-size:.8rem;color:var(--muted);font-weight:800;margin-top:10px}
+.sk{display:grid;grid-template-columns:150px 1fr 48px;align-items:center;gap:10px;padding:6px 0}
+.sk span{font-weight:800;font-size:.95rem}.sk b{text-align:right}
+.skt{height:14px;background:#edf0f4;border-radius:4px;overflow:hidden}.skt i{display:block;height:100%;background:#2f7bff;border-radius:0 4px 4px 0}
+.tkr{display:grid;grid-template-columns:1fr auto auto auto;gap:10px;align-items:center;padding:8px 0;border-bottom:2px dashed #e1e6ec}
+.tkr:last-child{border-bottom:none}.tkr span{font-weight:800}.tkr small{color:var(--muted);font-weight:800;font-size:.75rem}
+.tkr b{font-size:.9rem;color:#c4122f}.tkr b.g{color:#0f8a50}
+.empty{color:var(--muted);font-weight:800;margin:0}
+.tipbox{position:absolute;display:none;background:var(--ink);color:#fff;padding:6px 10px;border-radius:8px;font-size:.85rem;font-weight:800;pointer-events:none;z-index:60;max-width:260px}
+@media (max-width:480px){.stg{grid-template-columns:repeat(2,1fr)}.sk{grid-template-columns:110px 1fr 42px}.tkr small{display:none}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<div class="pop" id="pop">🪙</div>
+<script>
+/* ---------------- DATA (from Filipp's French notebook, Sept – Nov 2026) ---------------- */
+const NUM=["zéro","un","deux","trois","quatre","cinq","six","sept","huit","neuf","dix","onze","douze","treize","quatorze","quinze","seize","dix-sept","dix-huit","dix-neuf","vingt"];
+function numWord(n){ if(n<=20) return NUM[n]; if(n===21) return "vingt et un"; if(n<30) return "vingt-"+NUM[n-20]; if(n===30) return "trente"; return "trente et un"; }
+const DAYS=["lundi","mardi","mercredi","jeudi","vendredi","samedi","dimanche"];
+const DAYS_EN=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
+const MONTHS=["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"];
+const MONTHS_EN=["January","February","March","April","May","June","July","August","September","October","November","December"];
+
+const TOPICS={
+ greet:{name:"Les salutations",ic:"👋",items:[
+  ["Bonjour !","Hello!","👋"],["Salut !","Hi! (informal)","🙋"],["Coucou !","Hey there! (friendly)","😊"],["Bonsoir !","Good evening!","🌇"],["Allô ?","Hello? (on the phone)","📞"],
+  ["Ça va ?","How are you? / Are you OK?"],["Comment ça va ?","How are you?"],["Comment allez-vous ?","How are you? (polite)","🎩"],["Ça va bien, merci.","I'm fine, thank you."],
+  ["Merci !","Thanks!","🙏"],["Enchanté !","Nice to meet you!","🤝"],["Et toi ?","And you?"],["Au revoir !","Goodbye!","👋"],["À bientôt !","See you soon!"],["À demain !","See you tomorrow!"],
+  ["Bonne après-midi !","Good afternoon!","☀️"],["Bonne journée !","Have a great day!","🌞"],["oui","yes","✅"],["non","no","❌"]]},
+ me:{name:"Je me présente",ic:"🙂",items:[
+  ["Comment tu t'appelles ?","What's your name?"],["Je m'appelle Filipp.","My name is Filipp."],["Il s'appelle Max.","His name is Max."],["Elle s'appelle Léa.","Her name is Léa."],
+  ["Quel âge as-tu ?","How old are you?"],["J'ai onze ans.","I'm eleven."],["Quel âge a-t-il ?","How old is he?"],["Elle a douze ans.","She is twelve."],
+  ["le garçon","the boy","👦"],["l'ami","the friend (boy)","🧑"],["l'amie","the friend (girl)","👧"],["le copain","the friend / mate (boy)","🧑"],["la copine","the friend / mate (girl)","👧"]]},
+ numbers:{name:"Les nombres 1–20",ic:"🔢",items:Array.from({length:20},(_,i)=>[numWord(i+1),String(i+1)])},
+ classe:{name:"Les objets de la classe",ic:"🎒",items:[
+  ["le livre","book","📕"],["le stylo","pen","🖊️"],["le crayon","pencil","✏️"],["le cahier","exercise book","📓"],["le sac","bag","👜"],["le sac à dos","backpack","🎒"],
+  ["le cartable","school bag","💼"],["le taille-crayon","pencil sharpener","🔧"],["la gomme","rubber","🧽"],["la règle","ruler","📏"],["la trousse","pencil case","👝"],
+  ["la table","table","🪑"],["la chaise","chair","💺"]]},
+ colors:{name:"Les couleurs",ic:"🎨",items:[["rouge","red","🔴"],["noir","black","⚫"],["gris","grey","🩶"],["jaune","yellow","🟡"],["marron","brown","🟤"],["rose","pink","🩷"],
+  ["blanc","white","⚪"],["violet","purple","🟣"],["bleu","blue","🔵"],["vert","green","🟢"],["orange","orange","🟠"],["arc-en-ciel","rainbow","🌈"]]},
+ days:{name:"Les jours",ic:"📅",items:DAYS.map((d,i)=>[d,DAYS_EN[i]]).concat([["hier","yesterday","⬅️"],["aujourd'hui","today","📍"],["demain","tomorrow","➡️"],["le jour","the day","☀️"]])},
+ months:{name:"Les mois",ic:"🗓️",items:MONTHS.map((m,i)=>[m,MONTHS_EN[i]]).concat([["C'est quand ton anniversaire ?","When is your birthday?","🎂"],["Mon anniversaire, c'est le 23 mars.","My birthday is on 23 March.","🎉"]])},
+ likes:{name:"J'aime / je n'aime pas",ic:"❤️",items:[
+  ["aimer","to like","❤️"],["adorer","to love","😍"],["détester","to hate","😖"],["J'aime","I like"],["J'adore","I love"],["Je déteste","I hate"],["Je n'aime pas","I don't like","👎"],["mais","but"],["et","and"],
+  ["les chats","cats","🐱"],["les chiens","dogs","🐶"],["le sport","sport","🏅"],["les jeux vidéo","video games","🎮"],["les bonbons","sweets","🍬"],["le chocolat","chocolate","🍫"],
+  ["la pizza","pizza","🍕"],["la musique","music","🎵"],["le foot","football","⚽"],["le basket","basketball","🏀"],["les insectes","insects","🐞"],["le shopping","shopping","🛍️"],["le français","French (the subject)","🇫🇷"],
+  ["Qu'est-ce que tu aimes ?","What do you like?"],["Qu'est-ce que tu n'aimes pas ?","What don't you like?"]]},
+ vocab:{name:"Verbes & questions",ic:"❓",items:[
+  ["jouer","to play","🎲"],["parler","to talk","🗣️"],["écouter","to listen","🎧"],["regarder","to watch / look at","📺"],["manger","to eat","🍽️"],["avoir","to have","🤲"],
+  ["avec","with","🤝"],["ensemble","together","👫"],["parce que","because"],["la mode","fashion / style","👗"],["le groupe","band / group","🎸"],["dans","in","📦"],
+  ["il y a","there is / there are"],["il n'y a pas de","there is no / there are no"],
+  ["qui ?","who?"],["comment ?","how?"],["quand ?","when?","⏰"],["où ?","where?","📍"],["pourquoi ?","why?"],["qu'est-ce que… ?","what…?"],["est-ce que… ?","do you…? (yes/no question)"]]}
+};
+Object.values(TOPICS).forEach(t=>t.items=t.items.map(([de,en,e])=>({de,en,e:e||""})));
+
+/* nouns with le / la / les (for the article and colour games) */
+const NOUNS=Object.values(TOPICS).flatMap(t=>t.items).filter(x=>/^(le|la|les) \S/.test(x.de)&&!/[?.!]/.test(x.de)&&x.de!=="le groupe"&&x.de!=="la mode").map(x=>{const [g,...r]=x.de.split(" ");return{g,w:r.join(" "),en:x.en,e:x.e}});
+const OBJ=NOUNS.filter(n=>TOPICS.classe.items.some(x=>x.de===n.g+" "+n.w)&&!/ /.test(n.w)&&n.w!=="taille-crayon");
+
+const PERS=["je (j')","tu","il / elle","nous","vous","ils / elles"];
+const er=st=>[st+"e",st+"es",st+"e",st+"ons",st+"ez",st+"ent"];
+const VERBS={
+ avoir:{en:"to have",f:["ai","as","a","avons","avez","ont"]},
+ "s'appeler":{en:"to be called",f:["m'appelle","t'appelles","s'appelle","nous appelons","vous appelez","s'appellent"]},
+ jouer:{en:"to play",f:er("jou")},
+ aimer:{en:"to like",f:er("aim")},
+ adorer:{en:"to love",f:er("ador")},
+ détester:{en:"to hate",f:er("détest")},
+ écouter:{en:"to listen",f:er("écout")},
+ regarder:{en:"to watch",f:er("regard")},
+ parler:{en:"to talk",f:er("parl")},
+ manger:{en:"to eat",f:["mange","manges","mange","mangeons","mangez","mangent"]}
+};
+const SENT=[ // [person, verb, before, after] — the school test: tu joues, nous jouons, elle écoute, Max aime, ils ont
+ [1,"jouer","Tu","au foot."],[3,"jouer","Mercredi, nous","aux jeux vidéo."],[4,"avoir","Vous","un chien."],[5,"avoir","Ils","des livres."],[0,"avoir","J'","un sac à dos."],
+ [2,"écouter","Elle","de la musique."],[2,"aimer","Max","le chocolat ?"],[1,"jouer","Tu","au tennis."],[3,"regarder","Nous","la télévision."],[0,"jouer","Je","aux jeux vidéo."],
+ [0,"aimer","J'","les chats."],[2,"aimer","Il","le sport."],[1,"aimer","Qu'est-ce que tu","?"],[0,"manger","Je","une pizza."],[3,"manger","Nous","des bonbons."],
+ [5,"jouer","Ils","au basket."],[5,"regarder","Elles","la télévision."],[4,"écouter","Vous","de la musique."],[1,"avoir","Tu","un cahier bleu."],[2,"avoir","Elle","douze ans."],
+ [0,"s'appeler","Je","Filipp."],[1,"s'appeler","Comment tu","?"],[2,"s'appeler","Il","Xavier."],[2,"s'appeler","Comment elle","?"],[0,"détester","Je","les insectes."],
+ [0,"adorer","J'","les bonbons."],[3,"parler","Nous","français."],[4,"jouer","Vous","ensemble ?"],[5,"avoir","Elles","trois trousses."],[3,"avoir","Nous","un chat."],
+[2,"jouer","Elle","avec ses copines."],[4,"regarder","Vous","la télé ?"],[5,"aimer","Ils","la pizza."],[1,"écouter","Tu","de la musique ?"]
+];
+const NAMES=["Max","Léa","Xavier","Chloé","Tom","Emma","Hugo","Lina","Lucas","Inès","Filipp","Jules","Manon","Nathan"];
+const ABC={a:"a",b:"bé",c:"cé",d:"dé",e:"e",f:"effe",g:"gé",h:"ache",i:"i",j:"ji",k:"ka",l:"elle",m:"emme",n:"enne",o:"o",p:"pé",q:"ku",r:"erre",s:"esse",t:"té",u:"u",v:"vé",w:"double vé",x:"ixe",y:"i grec",z:"zède"};
+const spellOut=name=>[...name.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"")].map(c=>ABC[c]||c).join(" – ");
+const READ=[
+ {t:"Bonjour ! Je m'appelle Chloé. J'ai douze ans. J'aime les chats et le chocolat, mais je déteste le sport.",
+  q:[["How old is Chloé?","12",["11","12","20"],"J'ai douze ans. — douze = 12"],["What does Chloé hate?","sport",["cats","chocolate","sport"],"je déteste le sport — détester = to hate"],["What does Chloé like?","cats and chocolate",["dogs and pizza","cats and chocolate","sport and music"],"J'aime les chats et le chocolat."]]},
+ {t:"Salut ! Je m'appelle Xavier. J'ai onze ans. J'adore Internet et les jeux vidéo. Le samedi, je joue aux jeux vidéo avec mes copains.",
+  q:[["What is the boy's name?","Xavier",["Max","Xavier","Hugo"],"Je m'appelle Xavier."],["Who does Xavier play video games with?","with his friends",["alone","with his friends","with his dog"],"avec mes copains — avec = with, copains = friends"],["When does he play?","on Saturday",["on Monday","on Saturday","every day"],"Le samedi = on Saturday(s)"]]},
+ {t:"Dans mon sac à dos, il y a un livre vert, deux stylos bleus et trois cahiers rouges. Il n'y a pas de gomme.",
+  q:[["What colour is the book?","green",["red","blue","green"],"un livre vert — vert = green"],["How many exercise books are there?","three",["two","three","one"],"trois cahiers rouges — trois = 3"],["What is NOT in the backpack?","a rubber",["a pen","a book","a rubber"],"Il n'y a pas de gomme. — il n'y a pas de = there is no"]]},
+ {t:"• Coucou Léa ! Ça va ?\n▲ Ça va bien, merci. Et toi ?\n• Ça va. C'est quand ton anniversaire ?\n▲ C'est le 14 juillet !",
+  q:[["How is Léa?","fine, thanks",["not good","fine, thanks","tired"],"Ça va bien, merci. = I'm fine, thank you."],["When is Léa's birthday?","14 July",["14 June","4 July","14 July"],"C'est le 14 juillet — juillet = July"]]},
+ {t:"Aujourd'hui, c'est mercredi. Demain, c'est jeudi. Le mercredi, Tom joue au foot avec ses amis. Il ne joue pas au basket.",
+  q:[["What day is it tomorrow?","Thursday",["Tuesday","Thursday","Friday"],"Demain, c'est jeudi. — demain = tomorrow, jeudi = Thursday"],["What does Tom play on Wednesdays?","football",["basketball","football","tennis"],"Tom joue au foot"],["Does Tom play basketball?","no",["yes","no","on Fridays"],"Il ne joue pas au basket. — ne … pas = not"]]},
+ {t:"Voici Max. Il a onze ans. Il aime la musique. Il écoute de la musique avec sa copine Emma. Max n'aime pas les insectes.",
+  q:[["How old is Max?","11",["11","12","13"],"Il a onze ans. — onze = 11"],["Who does Max listen to music with?","his friend Emma",["his brother","his friend Emma","his teacher"],"avec sa copine Emma"],["What doesn't Max like?","insects",["music","insects","cats"],"Max n'aime pas les insectes."]]}
+];
+const ORDER=["Je m'appelle Filipp.","J'ai onze ans.","Comment tu t'appelles?","Quel âge as-tu?","J'aime les chats et les chiens.","Je n'aime pas le sport.",
+ "Je ne joue pas aux jeux vidéo.","Dans mon sac, il y a un livre.","J'ai un cahier vert.","Elle a une trousse rouge.","Mon anniversaire, c'est le 23 mars.",
+ "Qu'est-ce que tu aimes?","Il joue au foot avec ses copains.","Je n'ai pas de gomme.","Aujourd'hui, c'est mercredi.","J'adore le chocolat mais je déteste les insectes."];
+const DIALOG=[
+ {q:"Quel âge as-tu ?",a:"J'ai onze ans.",o:["J'ai onze ans.","Je m'appelle Max.","Ça va bien, merci."]},
+ {q:"Comment tu t'appelles ?",a:"Je m'appelle Max.",o:["Je m'appelle Max.","Onze ans.","Dimanche."]},
+ {q:"Comment ça va ?",a:"Ça va bien, merci.",o:["Ça va bien, merci.","Le chocolat.","Au revoir !"]},
+ {q:"Qu'est-ce que tu aimes ?",a:"J'aime le chocolat.",o:["J'aime le chocolat.","J'ai onze ans.","Bonsoir !"]},
+ {q:"Quel est ton jour préféré ?",a:"Dimanche.",o:["Dimanche.","Max.","Le chocolat."]},
+ {q:"Qu'est-ce que tu n'aimes pas ?",a:"Je n'aime pas le sport.",o:["Je n'aime pas le sport.","J'adore le sport.","Je m'appelle Sport."]},
+ {q:"Qu'est-ce que tu détestes ?",a:"Je déteste les insectes.",o:["Je déteste les insectes.","J'ai les insectes.","Il y a des insectes."]},
+ {q:"C'est quand ton anniversaire ?",a:"C'est le 23 mars.",o:["C'est le 23 mars.","J'ai onze ans.","C'est mercredi."]},
+ {q:"Quel âge a-t-il ?",a:"Il a douze ans.",o:["Il a douze ans.","Il s'appelle Léo.","J'ai douze ans."]},
+ {q:"Comment elle s'appelle ?",a:"Elle s'appelle Chloé.",o:["Elle s'appelle Chloé.","Il s'appelle Chloé.","Elle a Chloé."]},
+ {q:"Qu'est-ce qu'il y a dans ton sac ?",a:"Il y a un livre et un stylo.",o:["Il y a un livre et un stylo.","J'aime les livres.","C'est le 4 mai."]},
+ {q:"Avec qui il joue aux jeux vidéo ?",a:"Avec ses copains.",o:["Avec ses copains.","Parce que c'est cool.","Le samedi."]},
+ {q:"Pourquoi tu aimes le foot ?",a:"Parce que c'est super !",o:["Parce que c'est super !","Avec mes amis.","Dans mon sac."]},
+ {q:"Est-ce que tu aimes les chiens ?",a:"Oui, j'adore les chiens !",o:["Oui, j'adore les chiens !","Je m'appelle Max.","Dans la trousse."]},
+ {q:"Salut ! Ça va ?",a:"Ça va bien, merci. Et toi ?",o:["Ça va bien, merci. Et toi ?","Au revoir !","J'ai onze ans."]},
+ {q:"___ tu t'appelles ?",a:"Comment",o:["Comment","Quand","Où"]},
+ {q:"C'est ___ ton anniversaire ?",a:"quand",o:["quand","qui","pourquoi"]},
+ {q:"Avec ___ tu joues ?",a:"qui",o:["qui","où","quand"]},
+ {q:"___ est ta trousse ? — Dans mon sac.",a:"Où",o:["Où","Qui","Quand"]},
+ {q:"___ tu aimes le foot ? — Parce que c'est cool !",a:"Pourquoi",o:["Pourquoi","Comment","Où"]},
+ {q:"J'aime le foot ___ c'est cool.",a:"parce que",o:["parce que","mais","avec"]},
+ {q:"J'aime les chats ___ je déteste les insectes.",a:"mais",o:["mais","avec","dans"]},
+ {q:"🌇 It's 7 pm. You arrive and say: ___",a:"Bonsoir !",o:["Bonsoir !","Bonne journée !","Au revoir !"]},
+ {q:"👋 You are leaving. You say: ___",a:"Au revoir !",o:["Au revoir !","Bonjour !","Enchanté !"]},
+ {q:"📞 You answer the phone: ___",a:"Allô ?",o:["Allô ?","Merci !","Bonsoir !"]},
+ {q:"🤝 You meet someone for the first time: ___",a:"Enchanté !",o:["Enchanté !","À demain !","Allô ?"]},
+ {q:"🎩 You ask a grown-up politely how they are: ___",a:"Comment allez-vous ?",o:["Comment allez-vous ?","Coucou !","Salut !"]}
+];
+const NEG=[ // [positive, correct negative, wrong, wrong]
+ ["Je joue aux jeux vidéo.","Je ne joue pas aux jeux vidéo.","Je ne pas joue aux jeux vidéo.","Je joue ne pas aux jeux vidéo."],
+ ["J'aime le foot.","Je n'aime pas le foot.","Je ne aime pas le foot.","Je n'aime le foot pas."],
+ ["J'aime les insectes.","Je n'aime pas les insectes.","Je ne aime pas les insectes.","Je pas aime les insectes."],
+ ["J'ai un cahier bleu.","Je n'ai pas de cahier bleu.","Je n'ai pas un cahier bleu.","Je ne ai pas de cahier bleu."],
+ ["Il y a un stylo dans ma trousse.","Il n'y a pas de stylo dans ma trousse.","Il n'y a pas un stylo dans ma trousse.","Il ne y a pas de stylo dans ma trousse."],
+ ["Tu joues au tennis.","Tu ne joues pas au tennis.","Tu ne pas joues au tennis.","Tu joues pas ne au tennis."],
+ ["Nous regardons la télévision.","Nous ne regardons pas la télévision.","Nous ne pas regardons la télévision.","Nous regardons ne pas la télévision."],
+ ["Il aime le sport.","Il n'aime pas le sport.","Il ne aime pas le sport.","Il n'aime le sport pas."],
+ ["J'ai une gomme.","Je n'ai pas de gomme.","Je n'ai pas une gomme.","Je ne ai pas une gomme."],
+ ["Elle a des stylos rouges.","Elle n'a pas de stylos rouges.","Elle n'a pas des stylos rouges.","Elle ne a pas de stylos rouges."],
+ ["J'adore les bonbons.","Je n'adore pas les bonbons.","Je ne adore pas les bonbons.","J'adore ne pas les bonbons."],
+ ["Ils jouent au basket.","Ils ne jouent pas au basket.","Ils ne pas jouent au basket.","Ils jouent ne pas au basket."],
+ ["Il y a des chats.","Il n'y a pas de chats.","Il n'y a pas des chats.","Il ne y a pas de chats."],
+ ["Je mange une pizza.","Je ne mange pas de pizza.","Je ne mange pas une pizza.","Je ne pas mange de pizza."],
+ ["J'écoute la radio.","Je n'écoute pas la radio.","Je ne écoute pas la radio.","J'écoute pas ne la radio."]
+];
+const COLS=[["vert","green"],["noir","black"],["bleu","blue"],["rouge","red"],["jaune","yellow"],["rose","pink"],["gris","grey"]];
+const POSS={my:["mon","ma","mes"],your:["ton","ta","tes"],"his / her":["son","sa","ses"]};
+
+/* ---------------- EXPLANATIONS (shown after a wrong answer) ---------------- */
+const DLG_EN={"Quel âge as-tu ?":"How old are you?","J'ai onze ans.":"I'm eleven.","Comment tu t'appelles ?":"What's your name?","Je m'appelle Max.":"My name is Max.",
+ "Comment ça va ?":"How are you?","Ça va bien, merci.":"I'm fine, thank you.","Qu'est-ce que tu aimes ?":"What do you like?","J'aime le chocolat.":"I like chocolate.",
+ "Quel est ton jour préféré ?":"What is your favourite day?","Dimanche.":"Sunday.","Qu'est-ce que tu n'aimes pas ?":"What don't you like?","Je n'aime pas le sport.":"I don't like sport.",
+ "Qu'est-ce que tu détestes ?":"What do you hate?","Je déteste les insectes.":"I hate insects.","C'est quand ton anniversaire ?":"When is your birthday?","C'est le 23 mars.":"It's on 23 March.",
+ "Quel âge a-t-il ?":"How old is he?","Il a douze ans.":"He is twelve.","Comment elle s'appelle ?":"What's her name?","Elle s'appelle Chloé.":"Her name is Chloé.",
+ "Qu'est-ce qu'il y a dans ton sac ?":"What is in your bag?","Il y a un livre et un stylo.":"There is a book and a pen.","Avec qui il joue aux jeux vidéo ?":"Who does he play video games with?",
+ "Avec ses copains.":"With his friends.","Pourquoi tu aimes le foot ?":"Why do you like football?","Parce que c'est super !":"Because it's great!",
+ "Est-ce que tu aimes les chiens ?":"Do you like dogs?","Oui, j'adore les chiens !":"Yes, I love dogs!","Salut ! Ça va ?":"Hi! How are you?","Ça va bien, merci. Et toi ?":"I'm fine, thanks. And you?"};
+const GENDER={le:"masculine",la:"feminine",les:"plural"};
+const NOUN_TIP={gomme:"la gomme, la règle, la trousse, la table, la chaise — the feminine school things.",règle:"la gomme, la règle, la trousse, la table, la chaise — the feminine school things.",
+ trousse:"la gomme, la règle, la trousse, la table, la chaise — the feminine school things.",table:"la gomme, la règle, la trousse, la table, la chaise — the feminine school things.",
+ chaise:"la gomme, la règle, la trousse, la table, la chaise — the feminine school things.",livre:"le livre ends in -e but it is masculine — learn le / la with every noun.",
+ cartable:"le cartable ends in -e but it is masculine — learn le / la with every noun."};
+const accentNote=s=>/[éèêàçâôûîëïù]/.test(s)?" Watch the accents (é è ê à ç) — tap the buttons under the box.":"";
+function articleNote(de){ const m=de.match(/^(le|la|les) (.+)$/); if(!m) return "";
+  return ` <b>${m[1]}</b> = ${GENDER[m[1]]}${m[1]==="les"?"":` (a/an: <b>${m[1]==="le"?"un":"une"}</b>)`}. Always learn a noun with le or la.`; }
+function verbRule(pi,v){
+  if(v==="avoir") return `<b>avoir</b> (to have) is irregular — learn it by heart: j'<b>ai</b>, tu <b>as</b>, il/elle <b>a</b>, nous <b>avons</b>, vous <b>avez</b>, ils/elles <b>ont</b>.`;
+  if(v==="s'appeler") return `s'appeler: je <b>m'appelle</b>, tu <b>t'appelles</b>, il/elle <b>s'appelle</b> — double <b>ll</b>, and tu ends in <b>-s</b>.`;
+  const st=v.slice(0,-2), end=["e","es","e","ons","ez","ent"][pi];
+  let t=`<b>${v}</b> is an -er verb: take away <b>-er</b> → <b>${st}</b>, then add the ending for ${PERS[pi]}: <b>-${end}</b>. (je -e, tu -es, il/elle -e, nous -ons, vous -ez, ils/elles -ent)`;
+  if(v==="manger"&&pi===3) t+=" Careful: nous mang<b>e</b>ons keeps the e so it sounds soft.";
+  if(pi===1) t+=" The -s of tu is silent, but you must write it!";
+  if(pi===5) t+=" The -ent of ils/elles is silent, but you must write it!";
+  return t;
+}
+function explain(q){
+  switch(q.type){
+  case "words": return `“${esc(q.it.de)}” means “${esc(q.it.en)}”.`+articleNote(q.it.de);
+  case "spell": return `“${esc(q.it.en)}” in French is <b>${esc(q.it.de)}</b>.`+articleNote(q.it.de)+accentNote(q.it.de);
+  case "hoeren": return q.ask.startsWith("You hear a question")?`The question was “${esc(q.say)}” = “${esc(DLG_EN[q.say]||"")}”. Answer: “${esc(q.a)}” = “${esc(DLG_EN[q.a]||q.a)}”.`:`“${esc(q.say)}” means “${esc(q.a)}”.`;
+  case "artikel": { const n=q.n, tip=NOUN_TIP[n.w]||"";
+    if(n.g==="les") return `${esc(n.w)} (${esc(n.en)}) is plural — you can see the <b>-s</b> → <b>les ${esc(n.w)}</b>. Plural is always <b>les</b> (the) or <b>des</b> (some).`;
+    return `${esc(n.w)} (${esc(n.en)}) is ${GENDER[n.g]} → <b>${n.g} ${esc(n.w)}</b>, <b>${n.g==="le"?"un":"une"} ${esc(n.w)}</b>. Masculine: le / un · feminine: la / une. ${tip}`; }
+  case "verbs": { const [pi,v]=q.s; return verbRule(pi,v); }
+  case "praep": { const k=q.pl?"plural":q.g==="la"?"feminine":"masculine", f=POSS[q.who];
+    return `<b>${esc(q.post)}</b> is ${k} → <b>${q.a}</b>. ${q.who}: masculine <b>${f[0]}</b> · feminine <b>${f[1]}</b> · plural <b>${f[2]}</b>.${q.who==="his / her"?" Son / sa / ses depends on the THING, not on the boy or girl: sa trousse can be his or her pencil case.":""}`; }
+  case "caps": { const steps=[`${q.base}`]; let f=q.base;
+    if(q.fem){ if(f.endsWith("e")) steps.push(`feminine, but ${f} already ends in -e → no change`); else { f+="e"; steps.push(`feminine → + e → ${f}`);} }
+    if(q.pl){ if(f.endsWith("s")) steps.push(`plural, but it already ends in -s → no change`); else { f+="s"; steps.push(`plural → + s → ${f}`);} }
+    return `The colour agrees with the noun: ${steps.join(" · ")}. Answer: <b>${q.a}</b>. And the colour comes AFTER the noun: un cahier <b>vert</b>.`; }
+  case "neg": { const [p,c]=q.s; let t=`Put <b>ne</b> before the verb and <b>pas</b> after it: ${esc(c)}`;
+    if(/n'/.test(c)) t+=` Before a vowel (a, e, i, o, u, h) <b>ne</b> becomes <b>n'</b>: je n'aime, je n'ai, il n'y a.`;
+    if(/\b(un|une|des)\b/.test(p)&&/pas de\b|pas d'/.test(c)) t+=` After <b>pas</b>, un / une / des become <b>de</b>: J'ai un cahier → Je n'ai pas <b>de</b> cahier.`;
+    return t; }
+  case "dialog": { const d=q.d;
+    if(d.q.includes("___")){ const full=d.q.replace("___",d.a);
+      if(/^[🌇👋📞🤝🎩]/u.test(d.q)) return `Bonjour = hello (daytime) · Bonsoir = good evening · Allô = hello on the phone · Enchanté = nice to meet you · Au revoir = goodbye · Comment allez-vous ? = how are you (polite).`;
+      if(d.a==="mais"||d.a==="parce que") return `<b>mais</b> = but · <b>parce que</b> = because · <b>et</b> = and · <b>avec</b> = with.`;
+      return `Qui = who · Comment = how · Quand = when · Où = where · Pourquoi = why. → <b>${esc(full)}</b>`; }
+    return `“${esc(d.q)}” = “${esc(DLG_EN[d.q]||d.q)}” → “${esc(d.a)}” = “${esc(DLG_EN[d.a]||d.a)}”.`; }
+  case "num": { const n=q.n, w=numWord(n);
+    if(n<=16) return `${n} = <b>${w}</b>. Numbers 1–16 you learn by heart.${n===4?" Spelling: q-u-a-t-r-e.":n===14?" Spelling: q-u-a-t-o-r-z-e (quatre → quatorze).":n===2?" Spelling: d-e-u-x.":n===7?" The p in sept is silent, but you write it.":""}`;
+    if(n<20) return `17–19 = <b>dix</b> + 7 / 8 / 9 with a hyphen: ${n} = <b>${w}</b>.`;
+    return `20 = <b>vingt</b> (the g and t are silent).`; }
+  case "datum": { const d=q.d, wd=(d.getDay()+6)%7, m=d.getMonth();
+    if(q.mode==="write") return `${DAYS_EN[wd]} = <b>${DAYS[wd]}</b>, ${MONTHS_EN[m]} = <b>${MONTHS[m]}</b>. French order: day, number, month — <b>${DAYS[wd]} ${d.getDate()} ${MONTHS[m]}</b>. No “the”, no “th”.`;
+    return `hier = yesterday · aujourd'hui = today · demain = tomorrow. The week: lundi, mardi, mercredi, jeudi, vendredi, samedi, dimanche.`; }
+  case "abc": return `${esc(q.name)} = ${[...q.name.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"")].map(c=>`${c.toUpperCase()} “${ABC[c]||c}”`).join(", ")}.`;
+  case "satz": { if(/\bne\b|\bn'/.test(q.s)) return `Negative: <b>ne</b> (n') + verb + <b>pas</b>: ${esc(q.s)}`;
+    if(/^(Comment|Quel|Qu'est-ce)/.test(q.s)) return `The question word comes first: ${esc(q.s)}`;
+    return `Who + verb + the rest. Colours come after the noun: ${esc(q.s)}`; }
+  case "lesen": return q.q[3]?`Look at the text: “${esc(q.q[3])}”`:"";
+  }
+  return "";
+}
+
+/* pixel textures for the progress bar */
+(function(){ try{
+  const mk=(draw)=>{const c=document.createElement("canvas"); c.width=c.height=16; const x=c.getContext("2d"); draw(x); return c.toDataURL();};
+  const px=(x,cols,y0,y1)=>{for(let y=y0;y<y1;y++)for(let i=0;i<16;i++){x.fillStyle=cols[Math.floor(Math.random()*cols.length)]; x.fillRect(i,y,1,1);}};
+  const fill=mk(x=>{ px(x,["#7a5230","#6b4628","#8a5f38","#5e3d22","#946a42"],0,16);
+    px(x,["#5fa83a","#6dbb44","#4f9330","#7cc94f"],0,4);
+    for(let i=0;i<16;i++){ const d=Math.random()<.45?1+Math.floor(Math.random()*2):0; for(let k=0;k<d;k++){x.fillStyle=["#4f9330","#5fa83a"][k%2]; x.fillRect(i,4+k,1,1);} } });
+  const bg=mk(x=>px(x,["#ececec","#e2e2e2","#f4f4f4","#d9d9d9","#e8e8e8"],0,16));
+  const r=document.documentElement.style; r.setProperty("--tex-fill",`url(${fill})`); r.setProperty("--tex-bg",`url(${bg})`);
+}catch(e){} })();
+/* ---------------- STORAGE ---------------- */
+let S={xp:0,best:{},streak:0,last:"",days:{},types:{},items:{},rounds:0};
+try{const s=JSON.parse(localStorage.getItem("filipp-fr")||"null"); if(s) S=Object.assign(S,s);}catch(e){}
+function save(){try{localStorage.setItem("filipp-fr",JSON.stringify(S))}catch(e){}}
+["days","types","items"].forEach(k=>{ if(!S[k]||typeof S[k]!=="object") S[k]={}; }); S.rounds=S.rounds||0;
+(function(){const t=new Date().toDateString(); const y=new Date(Date.now()-864e5).toDateString();
+ if(S.last!==t && S.last!==y && S.last) S.streak=0;})();
+
+/* ---------------- HELPERS ---------------- */
+const $=s=>document.querySelector(s);
+const rnd=a=>a[Math.floor(Math.random()*a.length)];
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const norm=s=>s.normalize("NFC").replace(/[’‘`´]/g,"'").replace(/\s+/g," ").replace(/\s+([,.!?])/g,"$1").replace(/,(\S)/g,", $1").replace(/\.(\p{L})/gu,". $1").trim();
+const loose=s=>norm(s).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/œ/g,"oe");
+function check(input,answer){ // returns 'ok' | 'case' | 'umlaut' | 'bad'
+  const a=norm(input), b=norm(answer);
+  if(a===b) return "ok";
+  const sp=x=>x.replace(/[.!?]$/,"");
+  if(sp(a)===sp(b)) return "ok";
+  if(sp(a).toLowerCase()===sp(b).toLowerCase()) return "ok";
+  if(sp(loose(a))===sp(loose(b))) return "umlaut";
+  return "bad";
+}
+let deVoice=null, allVoices=[];
+function loadVoice(){ try{ allVoices=speechSynthesis.getVoices();
+  const de=allVoices.filter(x=>/^fr/i.test(x.lang));
+  deVoice=(S.voice&&allVoices.find(x=>x.voiceURI===S.voice))
+    || de.find(x=>/enhanced|premium|neural|natural|online/i.test(x.name)&&/^fr(-|_)FR/i.test(x.lang))
+    || de.find(x=>/google/i.test(x.name)) || de.find(x=>/^fr(-|_)FR/i.test(x.lang)) || de[0] || null;
+  if($("#vsel")) settings(); }catch(e){} }
+try{ loadVoice(); speechSynthesis.onvoiceschanged=loadVoice; }catch(e){}
+function say(t){ try{ speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(t.replace(/___/g,"")); u.lang="fr-FR"; if(deVoice) u.voice=deVoice; u.rate=S.rate||.85; speechSynthesis.speak(u);}catch(e){} }
+const canSpeak=typeof speechSynthesis!=="undefined";
+function pop(ch){const p=$("#pop"); p.textContent=ch; p.classList.add("show"); setTimeout(()=>p.classList.remove("show"),550);}
+const sayBtn=t=>canSpeak?`<button class="say" data-say="${esc(t)}">🔊 Listen</button>`:"";
+
+
+/* ---------------- FUN: mascot, confetti, sounds, levels ---------------- */
+const MASCOT=`<svg class="mascot" id="mascot" viewBox="0 0 100 100" aria-label="Croissy the croissant">
+ <path d="M8 66 C 10 34, 40 18, 50 18 C 60 18, 90 34, 92 66 C 84 58, 74 56, 66 60 C 60 52, 40 52, 34 60 C 26 56, 16 58, 8 66 Z" fill="#e7a24a" stroke="#1b1b2f" stroke-width="4" stroke-linejoin="round"/>
+ <path d="M30 28 C 34 40, 34 50, 34 60 M50 18 C 50 32, 50 44, 50 54 M70 28 C 66 40, 66 50, 66 60" fill="none" stroke="#b86e1f" stroke-width="3" stroke-linecap="round"/>
+ <path d="M24 34 C 30 30, 40 26, 48 25" fill="none" stroke="#f7cf8a" stroke-width="4" stroke-linecap="round" opacity=".8"/>
+ <circle cx="42" cy="40" r="6" fill="#fff" stroke="#1b1b2f" stroke-width="2.5"/><circle cx="58" cy="40" r="6" fill="#fff" stroke="#1b1b2f" stroke-width="2.5"/>
+ <circle cx="43.5" cy="41" r="2.8" fill="#1b1b2f"/><circle cx="59.5" cy="41" r="2.8" fill="#1b1b2f"/>
+ <circle cx="35" cy="49" r="3.5" fill="#ff7aa2" opacity=".8"/><circle cx="65" cy="49" r="3.5" fill="#ff7aa2" opacity=".8"/>
+ <path d="M44 48 Q50 55 56 48" fill="#1b1b2f" stroke="#1b1b2f" stroke-width="2.5" stroke-linejoin="round"/>
+ <path d="M30 76 h40" stroke="#1b1b2f" stroke-width="0" />
+</svg>`;
+const BREZI=["Bonjour, Filipp ! On y va ! 💪","Je m'appelle Croissy. Et toi ? 😄","Ça va ? Moi, ça va très bien ! 🥐","J'adore le français ! Et toi ? 🇫🇷","Encore un tour ? Oui ! 🔥","Tu ne sais pas ? Clique sur « I don't know » ! 🤷","Tu joues, nous jouons, ils jouent ! 🎮"];
+const LEVELS=["Débutant","Chasseur de mots","Ninja des phrases","Maître des verbes","Héros","Champion","Légende"];
+const XP_PER=20;
+function levelInfo(){const l=Math.floor(S.xp/XP_PER); return {n:l+1,title:LEVELS[Math.min(l,LEVELS.length-1)],pct:(S.xp%XP_PER)/XP_PER*100,left:XP_PER-S.xp%XP_PER};}
+function confetti(n){
+  const cols=["#ff3d5a","#2f7bff","#14b86a","#ffe066","#ff7a1a","#b8a8ff","#fff"];
+  for(let i=0;i<n;i++){const d=document.createElement("i"); d.className="conf";
+    d.style.left=Math.random()*100+"vw"; d.style.background=rnd(cols);
+    d.style.setProperty("--dx",(Math.random()*160-80)+"px"); d.style.setProperty("--r",(Math.random()*900-450)+"deg");
+    d.style.animationDuration=(1.1+Math.random()*1.3)+"s"; d.style.animationDelay=(Math.random()*.25)+"s";
+    document.body.appendChild(d); setTimeout(()=>d.remove(),2800);}
+}
+let actx=null;
+function tone(freqs,dur,type,vol){ if(S.sfx===false) return; try{ actx=actx||new (window.AudioContext||window.webkitAudioContext)();
+  let t=actx.currentTime; freqs.forEach(f=>{const o=actx.createOscillator(),g=actx.createGain(); o.type=type||"triangle"; o.frequency.value=f;
+   g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(vol||.18,t+.01); g.gain.exponentialRampToValueAtTime(.001,t+dur);
+   o.connect(g).connect(actx.destination); o.start(t); o.stop(t+dur+.02); t+=dur*.7;}); }catch(e){} }
+const sfxOk=()=>tone([660,880,1320],.13,"triangle",.16);
+const sfxBad=()=>tone([196,147],.18,"sawtooth",.07);
+const sfxWin=()=>tone([523,659,784,1047,1319],.14,"square",.08);
+
+/* ---------------- PROGRESS TRACKING & STATS ---------------- */
+const TYPE_NAME={words:"Word quiz",spell:"Spelling",hoeren:"Listening",lesen:"Reading",artikel:"le · la · les / un · une",verbs:"Verb forms",praep:"mon · ma · mes",
+ dialog:"Questions & answers",caps:"Colour agreement",neg:"ne … pas",num:"Numbers",datum:"Days & dates",abc:"Alphabet",satz:"Sentences"};
+const dayKey=d=>{d=d||new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");};
+function itemInfo(q){ // key + label + compact question for replay
+  switch(q.type){
+   case "words": case "spell": return {k:"w:"+q.it.de,l:`${q.it.de} = ${q.it.en}`,q:{type:q.type,it:q.it,dir:q.dir}};
+   case "hoeren": return {k:"h:"+q.say,l:`🎧 ${q.say}`,q};
+   case "artikel": { const r=artRight(q); return {k:"a:"+q.n.w+(q.indef?"|i":""),l:`${r} ${q.n.w}`,q}; }
+   case "verbs": return {k:"v:"+q.s.join("|"),l:verbFull(q.s),q};
+   case "praep": return {k:"p:"+q.a+" "+q.post,l:`${q.a} ${q.post} (${q.en})`,q};
+   case "dialog": return {k:"d:"+q.d.q,l:q.d.q.includes("___")?q.d.q.replace("___",q.d.a):`${q.d.q} → ${q.d.a}`,q};
+   case "caps": return {k:"c:"+q.c,l:q.full,q};
+   case "neg": return {k:"g:"+q.s[0],l:q.s[1],q};
+   case "num": return {k:"n:"+q.n,l:`${q.n} = ${numWord(q.n)}`,q};
+   case "datum": return {k:"t:"+q.mode,l:q.mode==="write"?"Writing the date (mercredi 4 novembre)":"hier · aujourd'hui · demain",q:{type:"datum",mode:q.mode}};
+   case "abc": return {k:"b:"+q.name,l:`Spelling the name ${q.name}`,q};
+   case "satz": return {k:"s:"+q.s,l:q.s,q};
+   case "lesen": return {k:"l:"+q.q[0],l:`📖 ${q.q[0]}`,q};
+  } return null; }
+function track(q,ok){
+  if(!q) return; const dk=dayKey(); const d=S.days[dk]=S.days[dk]||{q:0,ok:0}; d.q++; if(ok) d.ok++;
+  const t=S.types[q.type]=S.types[q.type]||{q:0,ok:0}; t.q++; if(ok) t.ok++;
+  const it=itemInfo(q); if(!it) return;
+  const r=S.items[it.k]=S.items[it.k]||{w:0,r:0,l:it.l,t:q.type,q:it.q};
+  if(ok) r.r++; else r.w++; r.l=it.l; r.q=it.q;
+  const keys=Object.keys(S.items); if(keys.length>400){ keys.sort((a,b)=>(S.items[a].w-S.items[a].r)-(S.items[b].w-S.items[b].r)).slice(0,keys.length-400).forEach(k=>delete S.items[k]); }
+  save();
+}
+function trickyList(){ return Object.values(S.items).filter(x=>x.w>0&&x.w>x.r-1).sort((a,b)=>(b.w-b.r*.5)-(a.w-a.r*.5)); }
+function trickyQuestions(){
+  const all=Object.values(TOPICS).flatMap(t=>t.items.map(x=>({t:t.name,...x})));
+  return shuffle(trickyList().slice(0,15)).slice(0,10).map(x=>{
+    const q=JSON.parse(JSON.stringify(x.q));
+    if(q.type==="words") q.p=all;
+    if(q.type==="datum"){ q.d=new Date(2026,Math.floor(Math.random()*12),1+Math.floor(Math.random()*28)); }
+    return q; });
+}
+function stats(){
+  const days=Object.entries(S.days), totQ=days.reduce((a,[,d])=>a+d.q,0), totOk=days.reduce((a,[,d])=>a+d.ok,0);
+  const L=levelInfo(), acc=totQ?Math.round(totOk/totQ*100):0;
+  // last 14 days
+  const last=[]; for(let i=13;i>=0;i--){ const d=new Date(); d.setDate(d.getDate()-i); const k=dayKey(d); last.push({d,k,...(S.days[k]||{q:0,ok:0})}); }
+  const max=Math.max(10,...last.map(x=>x.q));
+  const wd=["Su","Mo","Tu","We","Th","Fr","Sa"];
+  const bars=last.map((x,i)=>{ const h=x.q/max*100, today=i===13;
+    return `<div class="sb" data-tip="${x.d.toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"})}: ${x.q} answered${x.q?`, ${x.ok} correct (${Math.round(x.ok/x.q*100)}%)`:""}">
+      <div class="sbv">${x.q&&(today||x.q===max)?x.q:""}</div><div class="sbb" style="height:${Math.max(h,x.q?4:0)}%"></div><div class="sbl${today?" now":""}">${today?"today":wd[x.d.getDay()]}</div></div>`;}).join("");
+  const types=Object.entries(S.types).filter(([,t])=>t.q>0).sort((a,b)=>a[1].ok/a[1].q-b[1].ok/b[1].q);
+  const skill=types.length?types.map(([k,t])=>{const p=Math.round(t.ok/t.q*100);
+    return `<div class="sk" data-tip="${esc(TYPE_NAME[k]||k)}: ${t.ok} of ${t.q} correct"><span>${esc(TYPE_NAME[k]||k)}</span><div class="skt"><i style="width:${p}%"></i></div><b>${p}%</b></div>`}).join("")
+    :`<p class="empty">Play a few rounds and your skills will show up here.</p>`;
+  const tl=trickyList().slice(0,10);
+  const tricky=tl.length?`<div class="tk">${tl.map(x=>`<div class="tkr"><span>${esc(x.l)}</span><small>${esc(TYPE_NAME[x.t]||"")}</small><b>✗ ${x.w}</b><b class="g">✓ ${x.r}</b></div>`).join("")}</div>
+     <button class="btn next" id="trickyGo">🎯 Practise these</button>`:`<p class="empty">No tricky ones yet — great! Mistakes you make will appear here so you can practise them again.</p>`;
+  const tile=(ic,v,l)=>`<div class="st"><div class="sti">${ic}</div><div class="stv">${v}</div><div class="stl">${l}</div></div>`;
+  $("#app").innerHTML=`<div class="top"><button class="x" id="quit">✕</button><h1 style="font-size:1.7rem">📊 My progress</h1></div>
+   <div class="stg">${tile("🪙",S.xp,"coins")}${tile("🏅","Lv "+L.n,L.title)}${tile("🔥",S.streak,S.streak===1?"day in a row":"days in a row")}
+    ${tile("✅",totQ,"questions answered")}${tile("🎯",totQ?acc+"%":"–","correct")}${tile("🎮",S.rounds||0,"rounds played")}</div>
+   <h2>Last 14 days</h2><div class="panel"><div class="sbars">${bars}</div><div class="cap">Questions answered per day · hover a bar for details</div></div>
+   <h2>Skills</h2><div class="panel">${skill}${types.length?`<div class="cap">% correct · weakest at the top</div>`:""}</div>
+   <h2>Tricky ones</h2><div class="panel">${tricky}</div>
+   <div class="row"><button class="btn ghost" id="back2">← Back</button></div><div class="tipbox" id="tipbox"></div>`;
+  $("#quit").onclick=home; $("#back2").onclick=home;
+  if($("#trickyGo")) $("#trickyGo").onclick=()=>start("tricky");
+  const tb=$("#tipbox");
+  document.querySelectorAll("[data-tip]").forEach(el=>{
+    const show=e=>{ tb.textContent=el.dataset.tip; tb.style.display="block"; const r=el.getBoundingClientRect();
+      tb.style.left=Math.min(window.innerWidth-tb.offsetWidth-8,Math.max(8,r.left+r.width/2-tb.offsetWidth/2))+"px"; tb.style.top=(r.top+window.scrollY-tb.offsetHeight-8)+"px"; };
+    el.onmouseenter=show; el.onclick=show; el.onmouseleave=()=>tb.style.display="none"; });
+}
+/* ---------------- GAMES ---------------- */
+const GAMES={
+ words:{name:"Word quiz",ic:"🧠",col:"#ffc48c",desc:"Pick the right meaning",topics:true},
+ spell:{name:"Spell it",ic:"✍️",col:"#9cd0ff",desc:"Type the French word",topics:true},
+ cards:{name:"Flip cards",ic:"🃏",col:"#cdbcff",desc:"Learn words, no score",topics:true},
+ artikel:{name:"le · la · les",ic:"🎯",col:"#7ce8a8",desc:"le / la / les, un / une"},
+ verbs:{name:"Verb forms",ic:"⚙️",col:"#ff9e9e",desc:"tu joues, nous jouons, ils ont…"},
+ caps:{name:"Colours agree",ic:"🎨",col:"#e8d6b0",desc:"vert, verte, verts, vertes"},
+ praep:{name:"mon · ma · mes",ic:"🎒",col:"#9cd0ff",desc:"my, your, his / her"},
+ neg:{name:"ne … pas",ic:"🚫",col:"#ffb3b3",desc:"Je n'aime pas…"},
+ numbers:{name:"Numbers",ic:"🔢",col:"#ffe45c",desc:"Hear, read and write 1–20"},
+ datum:{name:"Days & dates",ic:"📆",col:"#ffb3dc",desc:"mercredi 4 novembre · demain"},
+ dialog:{name:"Questions & answers",ic:"💬",col:"#8ee8f2",desc:"Quel âge as-tu ? …"},
+ test:{name:"Test mix",ic:"🏆",col:"#ff9f43",desc:"15 mixed questions, like the school test"},
+ hoeren:{name:"Listening",ic:"🎧",col:"#b8a8ff",desc:"Hear it, pick the meaning"},
+ lesen:{name:"Reading",ic:"📖",col:"#a8f0c0",desc:"Read a short text, answer"},
+ abc:{name:"Alphabet",ic:"🔤",col:"#ffaad4",desc:"Spell a name in French"},
+ tricky:{name:"Tricky ones",ic:"🎯",col:"#e9edf2",desc:"Your most-missed questions"},
+ satz:{name:"Build sentences",ic:"🧩",col:"#fff07a",desc:"Put the words in order"}
+};
+let selTopics=new Set(["classe"]);
+let G=null; // current game state
+
+function home(){
+  speechSynthesis&&speechSynthesis.cancel&&speechSynthesis.cancel();
+  const stars=k=>{const b=S.best[k]; if(b==null) return ""; const s=b>=9?3:b>=7?2:b>=5?1:0; return "🪙".repeat(s)+`<span style="opacity:.25;filter:grayscale(1)">${"🪙".repeat(3-s)}</span>`;};
+  $("#app").innerHTML=`
+  <header><div class="flag"><i></i><i></i><i></i></div>
+   <h1>Bonjour, Filipp ! <small>French trainer · notebook Sept – Nov</small></h1>
+   <div class="stats"><span class="pill" title="Coins collected">🪙 ${S.xp}</span><span class="pill" title="Days in a row">📅 ${S.streak}</span><button class="pill" id="statsBtn" title="My progress">📊 Stats</button><button class="pill" id="sfxBtn" title="Sound effects">${S.sfx===false?"🔕":"🔔"}</button>${canSpeak?`<button class="pill" id="voiceBtn" title="Voice settings">🔊</button>`:""}</div></header>
+  <div class="hero">${MASCOT}<div class="bubble" id="bubble">${esc(rnd(BREZI))}</div></div>
+  ${(()=>{const L=levelInfo();return `<div class="lvl"><b>Lv ${L.n} · ${L.title}</b><div class="bar"><i style="width:${L.pct}%"></i></div><span style="white-space:nowrap;font-size:.85rem">${L.left} 🪙 to next</span></div>`})()}
+  <div class="grid">${tile("test",stars("test"))}</div>
+  <h2>Practise</h2>
+  <div class="grid">${["verbs","artikel","caps","praep","neg","dialog",canSpeak?"hoeren":null,"lesen","satz","numbers","datum","abc"].filter(Boolean).map(k=>tile(k,stars(k))).join("")}</div>
+  <h2>Words</h2>
+  <div class="chips" id="chips">${Object.entries(TOPICS).map(([k,t])=>`<button class="chip ${selTopics.has(k)?"on":""}" data-t="${k}">${t.ic} ${t.name}</button>`).join("")}</div>
+  <div class="grid" style="margin-top:12px">${["words","spell","cards"].map(k=>tile(k,stars(k))).join("")}</div>
+  <p class="mute">10 questions per round (Test mix: 15) · é è ê à ç buttons help with accents · tap 🔊 to hear the word · your coins are saved in this browser</p>`;
+  document.querySelectorAll("#chips .chip").forEach(b=>b.onclick=()=>{const t=b.dataset.t; if(selTopics.has(t)){ if(selTopics.size>1) selTopics.delete(t);} else selTopics.add(t); b.classList.toggle("on",selTopics.has(t));});
+  document.querySelectorAll("[data-g]").forEach(b=>b.onclick=()=>start(b.dataset.g));
+  if($("#voiceBtn")) $("#voiceBtn").onclick=settings;
+  $("#statsBtn").onclick=stats;
+  $("#sfxBtn").onclick=()=>{ S.sfx=S.sfx===false; save(); $("#sfxBtn").textContent=S.sfx===false?"🔕":"🔔"; sfxOk(); };
+  $("#mascot").onclick=()=>{ const t=rnd(BREZI); $("#bubble").textContent=t; say(t.replace(/[^\p{L}\p{N}\s,.!?'„“-]/gu,"")); tone([880,1175],.08,"sine",.12); };
+}
+function settings(){
+  const de=allVoices.filter(x=>/^fr/i.test(x.lang)), other=allVoices.filter(x=>!/^fr/i.test(x.lang));
+  const opt=v=>`<option value="${esc(v.voiceURI)}" ${deVoice&&v.voiceURI===deVoice.voiceURI?"selected":""}>${esc(v.name)} (${esc(v.lang)})${v.localService===false?" · online":""}</option>`;
+  $("#app").innerHTML=`<div class="top"><button class="x" id="quit">✕</button><h1 style="font-size:1.3rem">🔊 Voice</h1></div>
+   <div class="q" style="text-align:left;gap:12px">
+    ${de.length?`<label style="font-weight:800">French voice (${de.length} on this device)</label>
+    <select id="vsel" class="inp" style="margin:0;font-size:1rem;text-align:left">${de.map(opt).join("")}${other.length?`<optgroup label="Other languages (not recommended)">${other.map(opt).join("")}</optgroup>`:""}</select>`
+    :`<div style="font-weight:800;color:var(--bad)">No French voice found on this device — the words are read with a wrong accent. Install a French voice (see below), then reload this page.</div><select id="vsel" style="display:none"></select>`}
+    <label style="font-weight:800">Speed: <span id="rv">${(S.rate||.85).toFixed(2)}</span></label>
+    <input type="range" id="rate" min="0.5" max="1.1" step="0.05" value="${S.rate||.85}">
+    <div class="row" style="margin:0"><button class="btn" id="test">▶ Test: “Bonjour ! Je m'appelle Filipp. J'ai onze ans.”</button></div>
+   </div>
+   <div class="tip" style="line-height:1.6"><b>Better voices:</b> install a French voice in your device settings, then reload this page and pick it here.<br>
+    📱 <b>iPhone / iPad:</b> Settings → Accessibility → Spoken Content → Voices → French (France) → download e.g. “Amélie (Enhanced)”.<br>
+    💻 <b>Mac:</b> System Settings → Accessibility → Spoken Content → System voice → Manage Voices → French.<br>
+    🤖 <b>Android:</b> Settings → Text-to-speech → Google → Install voice data → Français.<br>
+    🪟 <b>Windows:</b> Settings → Time & language → Speech → Add voices → Français (France).<br>
+    🌐 In <b>Chrome</b> the “Google français” voice, in <b>Edge</b> “Microsoft Denise Online (Natural)” sound best.</div>
+   <div class="row"><button class="btn ghost" id="done">← Back</button></div>`;
+  const back=()=>home(); $("#quit").onclick=back; $("#done").onclick=back;
+  $("#vsel").onchange=e=>{ deVoice=allVoices.find(x=>x.voiceURI===e.target.value)||deVoice; S.voice=deVoice&&deVoice.voiceURI; save(); say("Bonjour ! Je m'appelle Filipp."); };
+  $("#rate").oninput=e=>{ S.rate=+e.target.value; $("#rv").textContent=S.rate.toFixed(2); save(); };
+  $("#rate").onchange=()=>say("Bonjour !");
+  $("#test").onclick=()=>say("Bonjour ! Je m'appelle Filipp. J'ai onze ans.");
+}
+function tile(k,st){const g=GAMES[k];return `<button class="tile${k==="test"?" big":""}" data-g="${k}" style="background:#e9edf2"><span class="ic">${g.ic}</span><span><b>${g.name}</b><span>${g.desc}</span>${st?`<span class="best">${st}</span>`:""}</span></button>`;}
+
+function pool(){return [...selTopics].flatMap(t=>TOPICS[t].items.map(x=>Object.assign({t},x)));}
+
+function makeQuestions(g){
+  const N=10, out=[];
+  if(g==="words"||g==="spell"||g==="cards"){
+    const p=pool(); let list=shuffle(p); while(list.length<N && g!=="cards") list=list.concat(shuffle(p));
+    return g==="cards"?list:list.slice(0,N).map(it=>({type:g,it,dir:Math.random()<.5?"de":"en",p}));
+  }
+  if(g==="artikel") return shuffle(NOUNS.concat(shuffle(NOUNS))).slice(0,N).map(n=>({type:"artikel",n,indef:n.g!=="les"&&Math.random()<.35}));
+  if(g==="verbs") return shuffle(SENT).slice(0,N).map(s=>({type:"verbs",s,mode:Math.random()<.5?"type":"pick"}));
+  if(g==="numbers"){ for(let i=0;i<N;i++){const n=1+Math.floor(Math.random()*20); out.push({type:"num",n,mode:rnd(canSpeak?["hear","read","write"]:["read","write"])});} return out; }
+  if(g==="datum"){ for(let i=0;i<N;i++){ const d=new Date(2026,Math.floor(Math.random()*12),1+Math.floor(Math.random()*28)); out.push({type:"datum",d,mode:i%2?"rel":"write",back:Math.random()<.4});} return out; }
+  if(g==="dialog") return shuffle(DIALOG).slice(0,N).map(d=>({type:"dialog",d}));
+  if(g==="caps") return Array.from({length:N},()=>capsQ());
+  if(g==="neg") return shuffle(NEG).slice(0,N).map(s=>({type:"neg",s}));
+  if(g==="praep") return Array.from({length:N},()=>praepQ());
+  if(g==="abc") return shuffle(NAMES).slice(0,N).map((name,i)=>({type:"abc",name,mode:canSpeak&&i%2===0?"hear":"read"}));
+  if(g==="satz") return shuffle(ORDER).slice(0,N).map(s=>({type:"satz",s}));
+  if(g==="lesen") return shuffle(READ.flatMap(r=>r.q.map(q=>({type:"lesen",t:r.t,q})))).slice(0,N);
+  if(g==="hoeren") return Array.from({length:N},()=>hoerenQ());
+  if(g==="tricky") return trickyQuestions();
+  if(g==="test"){
+    const all=Object.values(TOPICS).flatMap(t=>t.items.map(x=>({t:t.name,...x}))).filter(x=>!/[?.!]$/.test(x.de)||x.de.length<22);
+    const mk={
+      artikel:()=>({type:"artikel",n:rnd(NOUNS),indef:Math.random()<.3}),
+      neg:()=>({type:"neg",s:rnd(NEG)}),
+      verbs:()=>({type:"verbs",s:rnd(SENT),mode:rnd(["type","pick"])}),
+      dialog:()=>({type:"dialog",d:rnd(DIALOG)}),
+      praep:praepQ,
+      caps:capsQ,
+      num:()=>({type:"num",n:1+Math.floor(Math.random()*20),mode:rnd(canSpeak?["hear","read","write"]:["read","write"])}),
+      words:()=>({type:"words",it:rnd(all),dir:rnd(["de","en"]),p:all}),
+      spell:()=>({type:"spell",it:rnd(all.filter(x=>!/^\d/.test(x.en)))}),
+      lesen:()=>{const r=rnd(READ);return{type:"lesen",t:r.t,q:rnd(r.q)}},
+      satz:()=>({type:"satz",s:rnd(ORDER)}),
+      abc:()=>({type:"abc",name:rnd(NAMES),mode:canSpeak?"hear":"read"}),
+      hoeren:hoerenQ
+    };
+    let kinds=["artikel","verbs","verbs","verbs","dialog","dialog","praep","caps","neg","num","words","spell","lesen"];
+    if(canSpeak) kinds.push("hoeren","hoeren"); else kinds.push("words","dialog");
+    const seen=new Set(), qs=[];
+    for(const k of shuffle(kinds)){ let q, tries=0; do{ q=mk[k](); tries++; }while(seen.has(JSON.stringify(q))&&tries<10); seen.add(JSON.stringify(q)); qs.push(q); }
+    return qs;
+  }
+}
+function praepQ(){
+  const n=rnd(OBJ), who=rnd(Object.keys(POSS)), pl=Math.random()<.3, i=pl?2:(n.g==="la"?1:0);
+  const post=pl?n.w+"s":n.w, en=(who==="his / her"?"his / her":who)+" "+n.en+(pl?"s":"");
+  return {type:"praep",who,post,a:POSS[who][i],o:POSS[who],en,g:n.g,pl};
+}
+function capsQ(){
+  const n=rnd(OBJ), c=rnd(COLS), pl=Math.random()<.5, fem=n.g==="la";
+  const num=pl?rnd(["deux","trois","quatre","des"]):(fem?"une":"un"), noun=pl?n.w+"s":n.w;
+  let a=c[0]; if(fem&&!a.endsWith("e")) a+="e"; if(pl&&!a.endsWith("s")) a+="s";
+  return {type:"caps",c:`${num} ${noun} (${c[0]})`,pre:`J'ai ${num} ${noun}`,a,base:c[0],fem,pl,full:`J'ai ${num} ${noun} ${a}.`,en:c[1]};
+}
+const artRight=q=>q.indef?(q.n.g==="le"?"un":"une"):q.n.g;
+const verbFull=s=>{const [pi,v,b,a]=s, f=VERBS[v].f[pi]; return ((b?b+(b.endsWith("'")?"":" "):"")+f+(a?(a.startsWith("?")?" ":" ")+a:"")).trim();};
+function hoerenQ(){
+  const r=Math.random();
+  if(r<.3){ const d=rnd(DIALOG.filter(x=>!x.q.includes("___"))); return {type:"hoeren",say:d.q,ask:"You hear a question. What is the best answer?",a:d.a,o:d.o}; }
+  const groups=["colors","days","months","greet","classe","likes","vocab"];
+  const t=TOPICS[rnd(groups)], it=rnd(t.items);
+  const o=[it.en,...shuffle(t.items.filter(x=>x.en!==it.en)).slice(0,3).map(x=>x.en)];
+  return {type:"hoeren",say:it.de,ask:"What did you hear?",a:it.en,o};
+}
+
+function start(g){ G={g,qs:makeQuestions(g),i:0,score:0,combo:0,answered:false}; if(g==="cards") return cards(); render(); }
+
+function shell(inner){
+  const pct=G.i/G.qs.length*100;
+  $("#app").innerHTML=`<div class="top"><button class="x" id="quit" aria-label="Back">✕</button><div class="bar"><i style="width:${pct}%"></i></div>${G.combo>=2?`<span class="combo">🔥x${G.combo}</span>`:""}<span class="pill">🪙 ${G.score}</span></div>${inner}`;
+  $("#quit").onclick=home;
+  document.querySelectorAll("[data-say]").forEach(b=>b.onclick=()=>say(b.dataset.say));
+}
+const keysHTML=`<div class="keys">${["é","è","ê","à","ç","â","ô","û","î"].map(k=>`<button class="key" data-k="${k}">${k}</button>`).join("")}</div>`;
+function wireKeys(){ const inp=$("#inp"); document.querySelectorAll("[data-k]").forEach(b=>b.onclick=()=>{const s=inp.selectionStart??inp.value.length,e=inp.selectionEnd??s; inp.value=inp.value.slice(0,s)+b.dataset.k+inp.value.slice(e); inp.focus(); inp.setSelectionRange(s+1,s+1);}); }
+const fbHTML=`<button class="btn ghost next" id="idk" style="box-shadow:none;border-style:dashed;color:var(--muted)">🤷 I don't know — show me</button><div class="fb" id="fb"></div><button class="btn next" id="next" style="display:none">Next →</button>`;
+
+function render(){
+  if(G.i>=G.qs.length) return finish();
+  G.answered=false; G.reveal=null;
+  const q=G.qs[G.i];
+  let html="", after=null;
+  if(q.type==="words"){
+    const it=q.it, showDe=q.dir==="de";
+    const others=shuffle(q.p.filter(x=>x.de!==it.de && x.en!==it.en)).slice(0,3);
+    const opts=shuffle([it,...others]);
+    html=`<div class="q"><div class="hint">${showDe?"What does it mean?":"How do you say it in French?"}</div>${it.e&&it.t!=="numbers"?`<div class="emoji">${it.e}</div>`:""}
+      <div class="big">${esc(showDe?it.de:it.en)}</div>${showDe?sayBtn(it.de):""}</div>
+      <div class="opts">${opts.map(o=>`<button class="opt" data-v="${esc(o.de)}">${esc(showDe?o.en:o.de)}</button>`).join("")}</div>${fbHTML}`;
+    after=()=>pickWire(it.de, showDe?null:it.de, `${it.de} = ${it.en}`);
+  }
+  else if(q.type==="spell"){
+    const it=q.it;
+    html=`<div class="q"><div class="hint">Write it in French</div>${it.e?`<div class="emoji">${it.e}</div>`:""}<div class="big">${esc(it.en)}</div>${sayBtn(it.de)}</div>
+      <input class="inp" id="inp" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="type here…">${keysHTML}
+      <button class="btn next" id="go">Check</button>${fbHTML}`;
+    after=()=>typeWire(it.de, it.t==="classe"?"Don't forget le / la!":"");
+  }
+  else if(q.type==="artikel"){
+    const n=q.n, right=artRight(q), opts=q.indef?["un","une"]:["le","la","les"];
+    html=`<div class="q"><div class="hint">${q.indef?"un or une? (a / an)":"le, la or les? (the)"}</div><div class="emoji">${n.e}</div><div class="big">___ ${esc(n.w)}</div><div style="color:var(--muted);font-weight:700">${q.indef?"a ":"the "}${esc(n.en.replace(/^the /,""))}</div></div>
+      <div class="opts ${opts.length===3?"three":""}">${opts.map(a=>`<button class="opt art ${a}" data-v="${a}">${a}</button>`).join("")}</div>${fbHTML}`;
+    after=()=>pickWire(right, `${right} ${n.w}`, `<b>${right}</b> ${esc(n.w)}`, true);
+  }
+  else if(q.type==="verbs"){
+    const [pi,v,b,a]=q.s, ans=VERBS[v].f[pi];
+    const full=verbFull(q.s);
+    const sentence=`${esc(b)}${b.endsWith("'")?"":" "}<u>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</u> ${esc(a)}`;
+    html=`<div class="q"><div class="hint">${v} · ${VERBS[v].en}</div><div class="big">${sentence}</div><div style="color:var(--muted);font-weight:700">person: ${PERS[pi]}</div></div>`;
+    if(q.mode==="pick"){
+      const opts=[...new Set([ans,v,...shuffle(VERBS[v].f)])].slice(0,4);
+      html+=`<div class="opts">${shuffle(opts).map(o=>`<button class="opt" data-v="${esc(o)}">${esc(o)}</button>`).join("")}</div>${fbHTML}`;
+      after=()=>pickWire(ans, full, esc(full));
+    } else {
+      html+=`<input class="inp" id="inp" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="${esc(v)} → ?">${keysHTML}<button class="btn next" id="go">Check</button>${fbHTML}`;
+      after=()=>typeWire(ans, "", full);
+    }
+    html+=`<div class="tip">-er verbs: je <b>-e</b> · tu <b>-es</b> · il/elle <b>-e</b> · nous <b>-ons</b> · vous <b>-ez</b> · ils/elles <b>-ent</b> &nbsp;|&nbsp; avoir: j'<b>ai</b>, tu <b>as</b>, il <b>a</b>, nous <b>avons</b>, vous <b>avez</b>, ils <b>ont</b></div>`;
+  }
+  else if(q.type==="praep"){
+    const full=`${q.a} ${q.post}`;
+    html=`<div class="q"><div class="hint">${q.o.join(", ")}?</div><div class="emoji">🎒</div>
+      <div class="big" style="font-size:1.9rem"><u>&nbsp;&nbsp;?&nbsp;&nbsp;</u> ${esc(q.post)}</div><div style="color:var(--muted);font-weight:700">${esc(q.en)}</div></div>
+      <div class="opts three">${q.o.map(o=>`<button class="opt" data-v="${o}">${o}</button>`).join("")}</div>${fbHTML}
+      <div class="tip">masculine → <b>mon / ton / son</b> · feminine → <b>ma / ta / sa</b> · plural → <b>mes / tes / ses</b></div>`;
+    after=()=>pickWire(q.a, full, esc(full));
+  }
+  else if(q.type==="neg"){
+    const [p,c,w1,w2]=q.s;
+    html=`<div class="q"><div class="hint">Make it negative (ne … pas)</div><div class="emoji">🚫</div><div class="big" style="font-size:1.6rem">${esc(p)}</div></div>
+      <div class="opts" style="grid-template-columns:1fr">${shuffle([c,w1,w2]).map(o=>`<button class="opt" data-v="${esc(o)}">${esc(o)}</button>`).join("")}</div>${fbHTML}
+      <div class="tip"><b>ne</b> + verb + <b>pas</b> · before a vowel <b>n'</b> · un / une / des → <b>de</b></div>`;
+    after=()=>pickWire(c, c, esc(c));
+  }
+  else if(q.type==="abc"){
+    const sp=spellOut(q.name);
+    html=`<div class="q"><div class="hint">Comment ça s'écrit ? Write the name</div><div class="emoji">🔤</div>
+      ${q.mode==="hear"?`<button class="say" data-say="${esc(sp.replace(/ – /g,", "))}" style="font-size:1.2rem;padding:10px 22px">🔊 Play</button>`:`<div class="big" style="font-size:1.45rem">${esc(sp)}</div>`}</div>
+      <input class="inp" id="inp" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="name…"><button class="btn next" id="go">Check</button>${fbHTML}
+      <div class="tip">${Object.entries(ABC).map(([k,v])=>k+" "+v).join(" · ")}</div>`;
+    after=()=>{ typeWire(q.name,"",q.name+"  ("+sp+")"); if(q.mode==="hear") setTimeout(()=>say(sp.replace(/ – /g,", ")),250); };
+  }
+  else if(q.type==="satz"){
+    const words=q.s.replace(/[.?!]$/,"").replace(/,/g,"").split(" "), end=q.s.slice(-1);
+    let order=shuffle(words); if(order.join(" ")===words.join(" ")&&words.length>1) order=order.reverse();
+    html=`<div class="q"><div class="hint">Put the words in the right order</div><div class="big" id="built" style="font-size:1.6rem;min-height:2.4rem">…</div></div>
+      <div class="chips" id="pool" style="justify-content:center;margin-top:14px">${order.map((w,i)=>`<button class="chip" data-i="${i}" style="font-size:1.1rem">${esc(w)}</button>`).join("")}</div>
+      <div class="row"><button class="btn ghost" id="undo" style="flex:1">↺ Reset</button><button class="btn" id="go" style="flex:2">Check</button></div>${fbHTML}`;
+    after=()=>{
+      let picked=[];
+      const upd=()=>{$("#built").textContent=picked.length?picked.map(i=>order[i]).join(" ")+(picked.length===words.length?end:""):"…";
+        document.querySelectorAll("#pool .chip").forEach(c=>{c.disabled=picked.includes(+c.dataset.i); c.style.opacity=c.disabled?.25:1;});};
+      document.querySelectorAll("#pool .chip").forEach(c=>c.onclick=()=>{ if(G.answered) return; picked.push(+c.dataset.i); upd(); });
+      $("#undo").onclick=()=>{ if(G.answered) return; picked=[]; upd(); };
+      G.reveal=()=>{ say(q.s); $("#undo").style.display="none"; $("#built").textContent=q.s; result(false,`No problem — now you know! <span class="ans">${esc(q.s)}</span>`); };
+      $("#go").onclick=()=>{ if(G.answered||picked.length<words.length) return;
+        const ok=picked.map(i=>order[i]).join(" ")===words.join(" ");
+        say(q.s); $("#undo").style.display="none";
+        result(ok, ok?`Super! <span class="ans">${esc(q.s)}</span>`:`Not quite. <span class="ans">${esc(q.s)}</span>`); };
+    };
+  }
+  else if(q.type==="lesen"){
+    const [ques,ans,opts]=q.q;
+    html=`<div class="q" style="text-align:left"><div class="hint">Read</div><div style="font-size:1.15rem;font-weight:700;line-height:1.55;white-space:pre-line">${esc(q.t)}</div>${sayBtn(q.t.replace(/[•▲■]/g,""))}</div>
+      <div style="font-weight:800;margin-top:14px;font-size:1.1rem">${esc(ques)}</div>
+      <div class="opts" style="grid-template-columns:1fr">${shuffle(opts).map(o=>`<button class="opt" data-v="${esc(o)}">${esc(o)}</button>`).join("")}</div>${fbHTML}`;
+    after=()=>pickWire(ans,null,esc(ans));
+  }
+  else if(q.type==="hoeren"){
+    html=`<div class="q"><div class="hint">${esc(q.ask)}</div><div class="emoji">🎧</div><button class="say" data-say="${esc(q.say)}" style="font-size:1.2rem;padding:10px 22px">🔊 Play again</button></div>
+      <div class="opts">${shuffle(q.o).map(o=>`<button class="opt" data-v="${esc(o)}">${esc(o)}</button>`).join("")}</div>${fbHTML}`;
+    after=()=>{ pickWire(q.a,null,`You heard: <b>${esc(q.say)}</b><br>${esc(q.a)}`); setTimeout(()=>say(q.say),250); };
+  }
+  else if(q.type==="num"){
+    const n=q.n, w=numWord(n);
+    if(q.mode==="hear"){
+      html=`<div class="q"><div class="hint">Listen and type the number</div><div class="emoji">👂</div><button class="say" data-say="${w}" style="font-size:1.2rem;padding:10px 22px">🔊 Play</button></div>
+      <input class="inp" id="inp" inputmode="numeric" autocomplete="off" placeholder="1–20"><button class="btn next" id="go">Check</button>${fbHTML}`;
+      after=()=>{typeWire(String(n),"",`${n} = ${w}`); setTimeout(()=>say(w),250);};
+    } else if(q.mode==="read"){
+      const others=new Set([w]); while(others.size<4) others.add(numWord(1+Math.floor(Math.random()*20)));
+      html=`<div class="q"><div class="hint">Which word is this number?</div><div class="big" style="font-size:3.2rem">${n}</div></div>
+      <div class="opts">${shuffle([...others]).map(o=>`<button class="opt" data-v="${o}">${o}</button>`).join("")}</div>${fbHTML}`;
+      after=()=>pickWire(w,w,`${n} = ${w}`);
+    } else {
+      html=`<div class="q"><div class="hint">Write the number as a word</div><div class="big" style="font-size:3.2rem">${n}</div></div>
+      <input class="inp" id="inp" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="in French…">${keysHTML}<button class="btn next" id="go">Check</button>${fbHTML}`;
+      after=()=>typeWire(w,"",`${n} = ${w}`);
+    }
+  }
+  else if(q.type==="datum"){
+    const d=q.d, wd=(d.getDay()+6)%7, day=d.getDate(), m=d.getMonth();
+    const cal=`<div class="cal"><b>${DAYS_EN[wd]}</b><div>${day}</div><span>${MONTHS_EN[m]}</span></div>`;
+    if(q.mode==="write"){
+      const ans=`${DAYS[wd]} ${day} ${MONTHS[m]}`;
+      html=`<div class="q"><div class="hint">Write the date in French</div>${cal}</div>
+      <input class="inp" id="inp" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="lundi 1 janvier">${keysHTML}<button class="btn next" id="go">Check</button>${fbHTML}
+      <div class="tip">day + number + month — e.g. <b>mercredi 4 novembre</b>. Accents: f<b>é</b>vrier, ao<b>û</b>t, d<b>é</b>cembre.</div>`;
+      after=()=>typeWire(ans,"",ans,true);
+    } else {
+      const ans=DAYS[(wd+(q.back?6:1))%7];
+      html=`<div class="q"><div class="hint">Finish the sentence</div><div class="big" style="font-size:1.5rem">Aujourd'hui, c'est ${DAYS[wd]}.<br>${q.back?"Hier":"Demain"}, c'est <u>&nbsp;&nbsp;?&nbsp;&nbsp;</u>.</div></div>
+      <input class="inp" id="inp" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="${q.back?"hier":"demain"} → …">${keysHTML}<button class="btn next" id="go">Check</button>${fbHTML}
+      <div class="tip">hier = yesterday · aujourd'hui = today · demain = tomorrow</div>`;
+      after=()=>typeWire(ans,"",`${q.back?"Hier":"Demain"}, c'est ${ans}.`);
+    }
+  }
+  else if(q.type==="dialog"){
+    const d=q.d, gap=d.q.includes("___");
+    html=`<div class="q"><div class="hint">${gap?"Fill the gap":"What is the best answer?"}</div><div class="emoji">💬</div><div class="big" style="font-size:1.7rem">${esc(d.q)}</div>${gap?"":sayBtn(d.q)}</div>
+      <div class="opts ${gap?"three":""}">${shuffle(d.o).map(o=>`<button class="opt" data-v="${esc(o)}">${esc(o)}</button>`).join("")}</div>${fbHTML}`;
+    after=()=>pickWire(d.a, gap?d.q.replace("___",d.a):d.a, esc(gap?d.q.replace("___",d.a):d.q+" — "+d.a));
+  }
+  else if(q.type==="caps"){
+    html=`<div class="q"><div class="hint">Write the colour so it matches the noun</div><div class="emoji">🎨</div><div class="big" style="font-size:1.6rem">${esc(q.pre)} <u>&nbsp;&nbsp;?&nbsp;&nbsp;</u></div><div style="color:var(--muted);font-weight:700">colour: ${esc(q.base)} (${esc(q.en)})</div></div>
+      <input class="inp" id="inp" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="${esc(q.base)} → ?"><button class="btn next" id="go">Check</button>${fbHTML}
+      <div class="tip">feminine (la / une) → <b>+e</b> · plural → <b>+s</b> · both → <b>+es</b> · already ends in -e (rouge, jaune, rose) → no extra e</div>`;
+    after=()=>typeWire(q.a,"",q.full);
+  }
+  shell(html); after&&after();
+  const idk=$("#idk"); if(idk) idk.onclick=()=>{ if(!G.answered && G.reveal) G.reveal(); };
+}
+
+function result(ok,msg){
+  try{ track(G.qs[G.i],ok); }catch(e){}
+  G.answered=true;
+  if(ok){G.score++; S.xp++; G.combo=(G.combo||0)+1; save(); sfxOk(); confetti(G.combo>=3?28:12);
+    pop(G.combo>=3?`${G.combo}x COMBO! +1🪙`:"+1 🪙");
+    if(S.xp%XP_PER===0) setTimeout(()=>{pop(`LEVEL ${levelInfo().n}!`); confetti(60); sfxWin();},700);
+  } else { G.combo=0; sfxBad(); }
+  if(!ok){ let ex=""; try{ ex=explain(G.qs[G.i]); }catch(e){} if(ex) msg+=`<div class="why">💡 <span style="color:var(--muted)">Why?</span> ${ex}</div>`; }
+  const fb=$("#fb"); fb.className="fb "+(ok?"ok":"bad"); fb.innerHTML=msg;
+  const nx=$("#next"); nx.style.display="block"; const ik=$("#idk"); if(ik) ik.style.display="none"; const go=$("#go"); if(go) go.style.display="none";
+  nx.onclick=()=>{G.i++; render();}; nx.focus();
+}
+function pickWire(right, speak, explain, isArt){
+  G.reveal=()=>{ document.querySelectorAll(".opt").forEach(x=>{ if(x.dataset.v===right) x.classList.add("ok"); else if(isArt) x.classList.add("bad"); });
+    if(speak) say(speak); result(false,`No problem — now you know! <span class="ans">${explain}</span>`); };
+  document.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{
+    if(G.answered) return;
+    const ok=b.dataset.v===right;
+    document.querySelectorAll(".opt").forEach(x=>{ if(x.dataset.v===right) x.classList.add("ok"); else if(x===b) x.classList.add("bad"); else if(isArt) x.classList.add("bad"); });
+    if(speak) say(speak);
+    result(ok, ok?`${rnd(["Super !","Bravo !","Très bien !","Génial !","Parfait !"])} <span class="ans">${explain}</span>`:`Not quite. <span class="ans">${explain}</span>`);
+  });
+}
+function typeWire(right, extraTip, shown, isDate, isCaps){
+  const inp=$("#inp"); wireKeys(); setTimeout(()=>inp.focus(),50);
+  const go=()=>{
+    if(G.answered) return; const v=inp.value; if(!v.trim()) return;
+    const r=check(v,right); shown=shown||right;
+    say(shown.replace(/^\d+ = /,""));
+    if(r==="ok") return result(true,`${rnd(["Super !","Parfait !","Bravo !","Très bien !"])} <span class="ans">${esc(shown)}</span>`);
+    if(r==="umlaut") return result(true,`Almost perfect! Don't forget the accents (é è ê à ç): <span class="ans">${esc(shown)}</span>`);
+    if(r==="case") return result(false,`So close — check the <b>capital letters</b>! <span class="ans">${esc(shown)}</span>`);
+    let extra="";
+    if(isDate){ extra=dateTip(v,right); }
+    result(false,`Not quite. The answer is: <span class="ans">${esc(shown)}</span>${extra}${extraTip?`<div style="margin-top:6px;font-weight:700">${extraTip}</div>`:""}`);
+  };
+  $("#go").onclick=go;
+  G.reveal=()=>{ shown=shown||right; say(shown.replace(/^\d+ = /,"")); result(false,`No problem — now you know! <span class="ans">${esc(shown)}</span>`); };
+  inp.onkeydown=e=>{ if(e.key==="Enter"){ e.preventDefault(); if(G.answered) $("#next").click(); else go(); } };
+}
+function dateTip(v,right){
+  const n=loose(v), t=[];
+  if(/\b(the|th|le)\b/.test(n)) t.push("no “le” or “th” — just: mercredi 4 novembre");
+  if(/(january|february|march|april|june|july|august|september|october|november|december)\b/.test(n)||/septembre|octobre|novembre|decembre/.test(n)===false&&/ber\b/.test(n)) t.push("French months end in -bre: septembre, octobre, novembre, décembre");
+  return t.length?`<div style="margin-top:6px;font-weight:700">Check: ${t.join(" · ")}</div>`:"";
+}
+
+function finish(){
+  const sc=G.score, n=G.qs.length, r10=Math.round(sc/n*10), s=r10>=9?3:r10>=7?2:r10>=5?1:0;
+  if(S.best[G.g]==null||r10>S.best[G.g]) S.best[G.g]=r10;
+  S.rounds=(S.rounds||0)+1;
+  const t=new Date().toDateString(); if(S.last!==t){ S.streak=(S.last===new Date(Date.now()-864e5).toDateString())?S.streak+1:1; S.last=t; }
+  save();
+  const msg=["Keep going — you'll get it!","Good start!","Très bien !","Waouh, parfait ! 🏆"][s];
+  $("#app").innerHTML=`<div class="end"><div class="hero" style="justify-content:center">${MASCOT}<div class="bubble">${["Continue ! Tu vas y arriver ! 💪","Bien joué ! 👍","Très bien, Filipp ! 🎉","WAOUH ! Parfait ! 🏆"][s]}</div></div><div class="stars">${"🪙".repeat(s)}${`<span style="opacity:.25;filter:grayscale(1)">${"🪙".repeat(3-s)}</span>`}</div>
+   <h1 style="margin:10px 0">${sc} / ${n}</h1><p style="font-weight:800;font-size:1.2rem">${msg}</p>
+   <div class="row" style="justify-content:center"><button class="btn" id="again">Play again</button><button class="btn ghost" id="back">Menu</button></div></div>`;
+  $("#again").onclick=()=>start(G.g); $("#back").onclick=home;
+  if(s>=2){ confetti(s===3?120:50); sfxWin(); }
+  if(s===3) say("Super, Filipp ! Parfait !");
+}
+
+function cards(){
+  const list=G.qs; let i=0;
+  const draw=()=>{
+    const it=list[i];
+    $("#app").innerHTML=`<div class="top"><button class="x" id="quit">✕</button><div class="bar"><i style="width:${(i+1)/list.length*100}%"></i></div><span class="pill">${i+1} / ${list.length}</span></div>
+     <div class="card3d"><div class="flip" id="flip">
+      <div class="face">${it.e&&it.t!=="numbers"?`<div class="emoji">${it.e}</div>`:""}<div class="big">${esc(it.de)}</div><div class="hint">tap to flip</div></div>
+      <div class="face back"><div class="big">${esc(it.en)}</div><div class="hint">${esc(it.de)}</div></div></div></div>
+     <div class="row" style="justify-content:center">${canSpeak?`<button class="btn ghost" id="sp">🔊 Listen</button>`:""}<button class="btn ghost" id="prev" ${i?"":"disabled"}>←</button><button class="btn" id="nx">${i<list.length-1?"Next →":"Done ✓"}</button></div>`;
+    $("#quit").onclick=home; $("#flip").onclick=()=>$("#flip").classList.toggle("on");
+    if($("#sp")) $("#sp").onclick=()=>say(it.de);
+    $("#prev").onclick=()=>{if(i){i--;draw();}};
+    $("#nx").onclick=()=>{ if(i<list.length-1){i++;draw();} else home(); };
+  };
+  draw();
+}
+home();
+</script>
+</body>
+</html>
