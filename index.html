@@ -141,11 +141,13 @@ const LS={get(k){try{return localStorage.getItem(k)}catch(e){return null}},
 const SKILLS_DE={words:"Word quiz",spell:"Spelling",hoeren:"Listening",lesen:"Reading",artikel:"der · das · die",verbs:"Verb forms",praep:"aus / in",dialog:"Questions & answers",caps:"Capital letters",num:"Numbers",datum:"Dates",abc:"Alphabet",satz:"Sentences"};
 const SKILLS_NL=Object.assign({},SKILLS_DE,{artikel:"de · het"});
 const SKILLS_FR={words:"Word quiz",spell:"Spelling",hoeren:"Listening",lesen:"Reading",artikel:"le · la · les / un · une",verbs:"Verb forms",praep:"mon · ma · mes",dialog:"Questions & answers",caps:"Colour agreement",neg:"ne … pas",num:"Numbers",datum:"Days & dates",abc:"Alphabet",satz:"Sentences"};
+const SKILLS_DAD={words:"Что это значит?",reverse:"Как сказать?",hoeren:"На слух",spell:"Написание",dialog:"Ответы в диалоге",num:"Числа и цены",time:"Время",verbs:"Глаголы"};
 const TR=[
   {id:"de",name:"German",ru:"Немецкий",sub:"Start + Lektion 1",file:"trainers/german.html",keys:["philipp-de"],skills:SKILLS_DE,flag:["#1d1d1d","#dd0000","#ffce00"]},
   {id:"nl",name:"Dutch",ru:"Нидерландский",sub:"DISK Thema 2 · Op school",file:"trainers/dutch.html",keys:["filipp-nl"],skills:SKILLS_NL,flag:["#ae1c28","#ffffff","#21468b"]},
   {id:"fr",name:"French",ru:"Французский",sub:"Notebook Sept – Nov",file:"trainers/french.html",keys:["filipp-fr"],skills:SKILLS_FR,flag:["#0055a4","#ffffff","#ef4135"]},
-  {id:"math",name:"Maths",ru:"Математика",sub:"MYP 1 + Year 6 · theory, tasks, times tables",file:"trainers/math-check.html",keys:["fd-answers","fd-psess","fd-drill","fd-pxp","fd-school","fd-focus"]}
+  {id:"math",name:"Maths",ru:"Математика",sub:"MYP 1 + Year 6 · theory, tasks, times tables",file:"trainers/math-check.html",keys:["fd-answers","fd-psess","fd-drill","fd-pxp","fd-school","fd-focus"]},
+  {id:"dad",name:"Dutch · basics",ru:"Нидерландский · папа",sub:"Приветствия, бар, числа, дни, время",file:"trainers/dutch-dad.html",keys:["mike-nl"],skills:SKILLS_DAD,who:"Майк",flag:["#ae1c28","#ffffff","#21468b"]}
 ];
 /* maths check: question id prefix → topic */
 const MT={i:"Целые числа",b:"Порядок действий",h:"НОД и НОК",v:"Признаки делимости",p:"Разряды и округление",o:"Четыре действия",f:"Делители и простые",fr:"Дроби",d:"Десятичные",c:"Проценты",r:"Пропорции",n:"Отрицательные числа",m:"Измерения",g:"Геометрия",s:"Статистика",a:"Алгебра"};
@@ -337,7 +339,7 @@ function renderReport(sums){
     const s=sums[i];
     if(t.id==="math") return mathReport(t,s);
     if(!s||!s.total) return `<div class="rcard"><div class="rhead"><span class="tname">${esc(t.ru)} <small>${esc(t.name)}</small></span><span class="pill none">не начато</span></div>
-      <p class="empty">Пока нет ответов. Здесь появятся данные, как только Филипп решит первые задания.</p></div>`;
+      <p class="empty">Пока нет ответов. Здесь появятся данные, как только ${esc(t.who||"Филипп")} решит первые задания.</p></div>`;
     const acc=Math.round(s.ok/s.total*100), wacc=s.week?Math.round(s.weekOk/s.week*100):null, [vc,vt]=verdict(acc);
     const bars=barsHtml(s.last14);
     const skills=s.skills.length?skillRows(s.skills):`<p class="empty">Нужно больше ответов, чтобы увидеть навыки.</p>`;

@@ -1,0 +1,371 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Nederlands · basis</title>
+<style>
+:root{--bg:#f6f4ef;--card:#fff;--ink:#1f2328;--mute:#69707a;--line:#e3e0d8;--or:#e8590c;--or2:#fff1e6;--bl:#21468b;--bl2:#e8eefb;--ok:#2b8a3e;--ok2:#e6f6ea;--bad:#c92a2a;--bad2:#fdecec;--chip:#efece4}
+@media (prefers-color-scheme:dark){:root{--bg:#16181c;--card:#1f2228;--ink:#e9eaec;--mute:#9aa1ab;--line:#30343c;--or:#ff8a3d;--or2:#3a2a1e;--bl:#8fb0ff;--bl2:#1f2a44;--ok:#69db7c;--ok2:#1d3324;--bad:#ff8787;--bad2:#3a2022;--chip:#2a2e35}}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif}
+#app{max-width:760px;margin:0 auto;padding:18px 16px 60px}
+h1{font-size:1.5rem;margin:0}
+h2{font-size:1.05rem;margin:26px 0 10px}
+.sub{color:var(--mute);font-size:.92rem}
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
+.stats{display:flex;gap:8px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:6px 12px;text-align:center;min-width:72px}
+.stat b{display:block;font-size:1.2rem}.stat span{font-size:.75rem;color:var(--mute)}
+.units{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+.unit{position:relative;background:var(--card);border:2px solid var(--line);border-radius:14px;padding:10px 12px 12px;cursor:pointer;text-align:left;font:inherit;color:inherit}
+.unit.on{border-color:var(--or);background:var(--or2)}
+.unit .wk{font-size:.72rem;color:var(--mute);text-transform:uppercase;letter-spacing:.04em}
+.unit .nm{font-weight:700;margin:2px 0 1px;padding-right:34px}
+.unit .ru{font-size:.85rem;color:var(--mute);padding-right:34px}
+.unit .bar{height:6px;background:var(--chip);border-radius:4px;margin-top:8px;overflow:hidden}.unit .bar i{display:block;height:100%;background:var(--ok)}
+.unit .lrn{position:absolute;top:8px;right:8px;border:0;background:var(--chip);border-radius:9px;width:32px;height:32px;cursor:pointer;font-size:1rem}
+.hint{font-size:.85rem;color:var(--mute);margin:6px 0 0}
+.games{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px}
+.game{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;cursor:pointer;text-align:left;font:inherit;color:inherit;display:flex;gap:10px;align-items:flex-start}
+.game:hover,.unit:hover{border-color:var(--or)}
+.game .ic{font-size:1.5rem;line-height:1}.game b{display:block}.game small{color:var(--mute);font-size:.8rem;display:block}
+.game.big{grid-column:1/-1;background:var(--bl2);border-color:transparent}
+.bar2{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:14px}
+.btn{font:inherit;font-weight:600;border:0;border-radius:11px;padding:10px 16px;cursor:pointer;background:var(--or);color:#fff}
+.btn.sec{background:var(--chip);color:var(--ink)}
+.btn:disabled{opacity:.5;cursor:default}
+.prog{flex:1;height:8px;background:var(--chip);border-radius:5px;overflow:hidden}.prog i{display:block;height:100%;background:var(--or);transition:width .3s}
+.q{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px 18px}
+.ctx{font-size:.85rem;color:var(--mute);margin-bottom:6px}
+.prompt{font-size:1.45rem;font-weight:700;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.prompt.ruP{font-weight:600}
+.say{border:0;background:var(--bl2);color:var(--bl);border-radius:50%;width:42px;height:42px;font-size:1.15rem;cursor:pointer;flex:none}
+.say.huge{width:76px;height:76px;font-size:2rem}
+.task{color:var(--mute);font-size:.9rem;margin-top:6px}
+.opts{display:grid;gap:8px;margin-top:16px}
+.opt{font:inherit;text-align:left;background:var(--bg);border:2px solid var(--line);border-radius:12px;padding:11px 14px;cursor:pointer;color:inherit}
+.opt:hover:not(:disabled){border-color:var(--bl)}
+.opt .k{display:inline-block;width:20px;color:var(--mute);font-size:.8rem}
+.opt.right{border-color:var(--ok);background:var(--ok2)}.opt.wrong{border-color:var(--bad);background:var(--bad2)}
+.row{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap}
+input.ans{flex:1;min-width:200px;font:inherit;font-size:1.15rem;padding:11px 13px;border-radius:12px;border:2px solid var(--line);background:var(--bg);color:var(--ink)}
+input.ans:focus{outline:none;border-color:var(--bl)}
+.fb{margin-top:14px;border-radius:12px;padding:12px 14px;font-size:.95rem}
+.fb.ok{background:var(--ok2)}.fb.bad{background:var(--bad2)}
+.fb b{font-size:1.02rem}
+.tip{margin-top:6px;color:var(--mute)}
+.keys{display:flex;gap:6px;margin-top:8px}.keys button{font:inherit;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:8px;padding:3px 10px;cursor:pointer}
+.cardv{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:30px 20px;text-align:center;min-height:220px;display:flex;flex-direction:column;justify-content:center;gap:10px;cursor:pointer}
+.cardv .nl{font-size:1.7rem;font-weight:700}.cardv .tr{font-size:1.1rem}.cardv .tp{color:var(--mute);font-size:.9rem}
+.note{background:var(--bl2);border-radius:12px;padding:10px 14px;font-size:.92rem;margin-bottom:14px}
+.res{text-align:center;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:26px 18px}
+.res .big{font-size:2.6rem;font-weight:800}
+.mist{text-align:left;margin:16px 0 0;padding:0;list-style:none}.mist li{border-top:1px solid var(--line);padding:8px 2px;font-size:.95rem}
+.set{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:.9rem;color:var(--mute);margin-top:24px}
+.set input{accent-color:var(--or)}
+@media (max-width:480px){.prompt{font-size:1.25rem}h1{font-size:1.3rem}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+/* ======================= CONTENT ======================= */
+const UNITS=[
+ {id:"groet",wk:"Неделя 1",nm:"Groeten",ru:"Привет и пока",note:"Звук <b>g</b> произносится как хриплое русское «х»: <i>goedemorgen</i> ≈ «худэморхэн». <b>oe</b> = «у», <b>ij</b> ≈ «эй»: <i>fijn</i> ≈ «фэйн».",items:[
+  ["Hallo!","Привет! / Здравствуйте!"],["Hoi!","Привет! (по-свойски)"],["Goedemorgen!","Доброе утро!"],["Goedemiddag!","Добрый день! (после 12:00)"],
+  ["Goedenavond!","Добрый вечер!"],["Goedenacht!","Спокойной ночи!"],["Dag!","Привет! / Пока!","Универсальное слово: и при встрече, и на прощание."],["Doei!","Пока! (по-свойски)"],
+  ["Tot ziens!","До свидания!"],["Tot straks!","До скорого! (увидимся сегодня)"],["Tot morgen!","До завтра!"],["Fijne dag!","Хорошего дня!"],["Fijn weekend!","Хороших выходных!"]]},
+ {id:"gaat",wk:"Неделя 1",nm:"Hoe gaat het?",ru:"Как дела",note:"<b>jij / je</b> — «ты», <b>u</b> (читается «ю») — «Вы». В Нидерландах «ты» говорят почти всем, «u» — пожилым и в официальных ситуациях.",items:[
+  ["Hoe gaat het?","Как дела?"],["Hoe gaat het met u?","Как у Вас дела? (вежливо)"],["Goed, dank je.","Хорошо, спасибо."],["Prima!","Отлично!"],["Heel goed!","Очень хорошо!"],
+  ["Het gaat.","Нормально. / Так себе."],["Niet zo goed.","Не очень."],["En met jou?","А у тебя?"],["En met u?","А у Вас?"],["Alles goed?","Всё в порядке?"],["Ja, alles goed!","Да, всё хорошо!"]]},
+ {id:"beleefd",wk:"Неделя 1",nm:"Beleefd",ru:"Вежливые слова",note:"<b>Alsjeblieft</b> (на «ты») и <b>alstublieft</b> (на «Вы») значат и «пожалуйста» в просьбе, и «вот, держите», когда что-то протягивают.",items:[
+  ["Dank je wel!","Большое спасибо! (на «ты»)"],["Dank u wel!","Большое спасибо! (на «Вы»)"],["Bedankt!","Спасибо!"],["Alsjeblieft.","Пожалуйста. / Вот, держи. (на «ты»)"],
+  ["Alstublieft.","Пожалуйста. / Вот, держите. (на «Вы»)"],["Graag gedaan!","Не за что!"],["Sorry!","Извините!"],["Pardon.","Простите. (дайте пройти)"],["Geen probleem.","Без проблем."],
+  ["ja","да"],["nee","нет"],["Ja, graag.","Да, с удовольствием."],["Nee, dank je.","Нет, спасибо."]]},
+ {id:"kennis",wk:"Неделя 2",nm:"Kennismaken",ru:"Знакомство",note:"<b>ui</b> — особый звук, примерно «ау» с округлёнными губами. <b>aa</b> — долгое «а»: <i>vandaan</i>, <i>aangenaam</i>.",items:[
+  ["Hoe heet je?","Как тебя зовут?"],["Ik heet Mike.","Меня зовут Майк."],["Wat is uw naam?","Как Ваше имя?"],["Waar kom je vandaan?","Откуда ты?"],
+  ["Ik kom uit Rusland.","Я из России."],["Waar woon je?","Где ты живёшь?"],["Ik woon in Nederland.","Я живу в Нидерландах."],["Aangenaam!","Очень приятно!"],
+  ["Leuk je te ontmoeten!","Рад познакомиться!"],["Wat doe je?","Чем ты занимаешься?"],["Dit is mijn zoon.","Это мой сын."],["Dit is mijn vrouw.","Это моя жена."]]},
+ {id:"hulp",wk:"Неделя 2",nm:"Help!",ru:"Если не понимаю",items:[
+  ["Ik spreek een beetje Nederlands.","Я немного говорю по-нидерландски."],["Ik begrijp het niet.","Я не понимаю."],["Kunt u dat herhalen?","Можете повторить?"],
+  ["Langzaam, alstublieft.","Медленнее, пожалуйста."],["Spreekt u Engels?","Вы говорите по-английски?"],["Wat betekent dat?","Что это значит?"],
+  ["Ik weet het niet.","Я не знаю."],["Waar is het toilet?","Где туалет?"],["Een moment, alstublieft.","Минутку, пожалуйста."]]},
+ {id:"kroeg",wk:"Неделя 2",nm:"In de kroeg",ru:"В баре и кафе",note:"<b>-tje</b> — уменьшительный суффикс: в баре говорят <i>een biertje</i> (≈ «бииртье»), а не <i>een bier</i>. <b>pinnen</b> — платить картой.",items:[
+  ["Een biertje, alstublieft.","Пиво, пожалуйста."],["Twee biertjes, graag.","Два пива, пожалуйста."],["Mag ik een koffie?","Можно кофе?"],["Ik wil graag een glas wijn.","Я бы хотел бокал вина."],
+  ["Wat wil je drinken?","Что будешь пить?"],["Wat mag het zijn?","Что желаете? (так спрашивает бармен)"],["Nog eentje, graag.","Ещё одно, пожалуйста."],
+  ["Mag ik de rekening?","Можно счёт?"],["Kan ik pinnen?","Можно оплатить картой?"],["Proost!","Будем! (тост)"],["Lekker!","Вкусно!"],
+  ["het bier","пиво"],["de wijn","вино"],["het water","вода"],["de koffie","кофе"],["de thee","чай"],["het glas","стакан, бокал"],["de fles","бутылка"],["de rekening","счёт"]]},
+ {id:"getal",wk:"Неделя 3",nm:"Getallen",ru:"Числа",note:"После 20 — <b>сначала единицы, потом десятки</b>: 21 = <i>eenentwintig</i> («один-и-двадцать»). После <i>twee</i> и <i>drie</i> пишется <b>ën</b>: <i>tweeëntwintig</i>.",items:null},
+ {id:"prijs",wk:"Неделя 3",nm:"Prijs en tijd",ru:"Цены и время",note:"<b>half vier</b> — это «половина четвёртого», то есть <b>3:30</b>, а не 4:30! <i>kwart over drie</i> = 3:15, <i>kwart voor vier</i> = 3:45.",items:[
+  ["Hoeveel kost het?","Сколько стоит?"],["Het kost vijf euro.","Стоит пять евро."],["vier euro vijftig","4,50 €"],["Hoe laat is het?","Который час?"],["Het is drie uur.","Сейчас три часа."],
+  ["half vier","3:30 (половина четвёртого)"],["kwart over drie","3:15"],["kwart voor vier","3:45"],["Hoe laat?","Во сколько?"],["om acht uur","в восемь часов"],["Dat is duur!","Это дорого!"],["Dat is goedkoop.","Это дёшево."]]},
+ {id:"dagen",wk:"Неделя 4",nm:"Dagen",ru:"Дни недели",note:"Дни недели и месяцы пишутся <b>с маленькой буквы</b>.",items:[
+  ["maandag","понедельник"],["dinsdag","вторник"],["woensdag","среда"],["donderdag","четверг"],["vrijdag","пятница"],["zaterdag","суббота"],["zondag","воскресенье"],
+  ["vandaag","сегодня"],["morgen","завтра"],["gisteren","вчера"],["overmorgen","послезавтра"],["vanavond","сегодня вечером"],["het weekend","выходные"],["de week","неделя"]]},
+ {id:"maand",wk:"Неделя 4",nm:"Maanden",ru:"Месяцы",items:[
+  ["januari","январь"],["februari","февраль"],["maart","март"],["april","апрель"],["mei","май"],["juni","июнь"],["juli","июль"],["augustus","август"],
+  ["september","сентябрь"],["oktober","октябрь"],["november","ноябрь"],["december","декабрь"],["Wanneer ben je jarig?","Когда у тебя день рождения?"],["in mei","в мае"]]},
+ {id:"afspraak",wk:"Неделя 4",nm:"Afspreken",ru:"Договориться о встрече",items:[
+  ["Heb je zin om iets te drinken?","Хочешь выпить чего-нибудь?"],["Ja, leuk!","Да, отлично!"],["Wanneer heb je tijd?","Когда у тебя есть время?"],
+  ["Ik heb geen tijd.","У меня нет времени."],["Ik kan niet.","Я не могу."],["Morgen kan ik wel.","Завтра я могу."],["Hoe laat spreken we af?","Во сколько встречаемся?"],
+  ["Om acht uur?","В восемь?"],["Afgesproken!","Договорились!"],["Zie je dan!","Тогда увидимся!"]]},
+ {id:"werkw",wk:"Недели 5–6",nm:"zijn · hebben · willen · kunnen",ru:"Главные глаголы",note:"У <b>jij</b> глагол получает <b>-t</b>: <i>jij bent, jij hebt</i>. Но если <i>jij/je</i> стоит после глагола (в вопросе), <b>-t</b> пропадает: <i>Heb je tijd? Ben jij Mike?</i>",items:[
+  ["ik ben","я есть (zijn — быть)"],["jij bent","ты есть (zijn)"],["hij / zij is","он / она есть (zijn)"],["wij zijn","мы есть (zijn)"],["u bent","Вы есть (zijn)"],
+  ["ik heb","у меня есть (hebben — иметь)"],["jij hebt","у тебя есть (hebben)"],["hij / zij heeft","у него / неё есть (hebben)"],["wij hebben","у нас есть (hebben)"],
+  ["ik wil","я хочу (willen)"],["jij wilt","ты хочешь (willen)"],["wij willen","мы хотим (willen)"],
+  ["ik kan","я могу (kunnen)"],["jij kunt","ты можешь (kunnen)"],["wij kunnen","мы можем (kunnen)"]]}
+];
+const NUMW=["nul","één","twee","drie","vier","vijf","zes","zeven","acht","negen","tien","elf","twaalf","dertien","veertien","vijftien","zestien","zeventien","achttien","negentien"];
+const TENS={2:"twintig",3:"dertig",4:"veertig",5:"vijftig",6:"zestig",7:"zeventig",8:"tachtig",9:"negentig"};
+function numWord(n){ if(n<20) return NUMW[n]; if(n===100) return "honderd"; if(n%10===0) return TENS[n/10];
+  const u=n%10===1?"een":NUMW[n%10]; return u+(/e$/.test(u)?"ën":"en")+TENS[Math.floor(n/10)]; }
+UNITS.find(u=>u.id==="getal").items=[...Array(21).keys(),30,40,50,60,70,80,90,100,21,22,35,47,99].map(n=>[numWord(n),String(n)]).concat([["duizend","1000"]]);
+
+const DIALOG=[ // [unit, who/context, cue, right reply, wrong replies]
+ ["groet","Сосед утром","Goedemorgen!","Goedemorgen!",["Goedenacht!","Tot morgen!","Proost!"]],
+ ["groet","Коллега уходит домой","Doei! Tot morgen!","Doei! Fijne avond!",["Goedemorgen!","Hoe heet je?","Een biertje, graag."]],
+ ["groet","Кассир в пятницу","Fijn weekend!","Dank je, jij ook!",["Graag gedaan!","Ik kom uit Rusland.","Hoe laat is het?"]],
+ ["gaat","Знакомый на улице","Hoi! Hoe gaat het?","Goed, dank je. En met jou?",["Ik heet Mike.","Twee biertjes, graag.","Graag gedaan!"]],
+ ["gaat","Друг","Alles goed?","Ja, alles goed! En met jou?",["Nee, dank je.","Om acht uur?","Wat betekent dat?"]],
+ ["beleefd","Вы помогли человеку","Dank je wel!","Graag gedaan!",["Proost!","Goedemiddag!","Ik begrijp het niet."]],
+ ["beleefd","Вас случайно толкнули","Sorry!","Geen probleem.",["Lekker!","Graag gedaan!","Tot ziens!"]],
+ ["beleefd","Вам предлагают ещё кофе, но вы не хотите","Wil je nog een koffie?","Nee, dank je.",["Ja, alles goed!","Afgesproken!","Hallo!"]],
+ ["kennis","Новый знакомый","Hoe heet je?","Ik heet Mike.",["Ik kom uit Rusland.","Het gaat.","Om acht uur."]],
+ ["kennis","Новый знакомый","Waar kom je vandaan?","Ik kom uit Rusland.",["Ik heet Mike.","Ik woon in de week.","Prima!"]],
+ ["kennis","Вам представили человека","Dit is Sanne.","Hoi Sanne, aangenaam!",["Tot ziens, Sanne!","Sanne, mag ik de rekening?","Goedenacht!"]],
+ ["hulp","Говорят слишком быстро","Zullen we morgen om half negen bij het station afspreken?","Langzaam, alstublieft.",["Proost!","Dank u wel, prima!","Een biertje, alstublieft."]],
+ ["hulp","Прохожий","Spreekt u Nederlands?","Een beetje.",["Ik woon in Nederland.","Kan ik pinnen?","Fijne dag!"]],
+ ["kroeg","Бармен","Wat mag het zijn?","Een biertje, alstublieft.",["Tot ziens!","Ik heet Mike.","Het gaat."]],
+ ["kroeg","Друг в баре","Wat wil je drinken?","Ik wil graag een glas wijn.",["Ik woon in Nederland.","Geen probleem.","Goedemorgen!"]],
+ ["kroeg","Бармен","Dat is dan zeven euro.","Kan ik pinnen?",["Hoe heet je?","Ik kan niet.","Tot straks!"]],
+ ["kroeg","Бармен","Pinnen of contant?","Pinnen, graag.",["Twee, graag.","Nee, dank je.","Ja, alles goed!"]],
+ ["kroeg","Друг поднимает бокал","Proost!","Proost!",["Sorry!","Doei!","Pardon."]],
+ ["kroeg","Официант","Wilt u nog iets drinken?","Ja, nog eentje, graag.",["Ja, ik heet Mike.","Ja, maandag.","Ja, ik begrijp het niet."]],
+ ["prijs","Прохожий","Hoe laat is het?","Het is half negen.",["Het kost vijf euro.","Op zaterdag.","Ik kom uit Rusland."]],
+ ["prijs","Продавец","Dat is vier euro vijftig.","Alstublieft.",["Goedenacht.","Prima, ik heet Mike.","Hoe gaat het?"]],
+ ["afspraak","Друг","Heb je zin om zaterdag iets te drinken?","Ja, leuk! Hoe laat?",["Nee, het is duur.","Ik heet Mike.","Goedemorgen!"]],
+ ["afspraak","Друг","Om acht uur?","Afgesproken!",["Graag gedaan!","Sorry!","Mag ik de rekening?"]],
+ ["afspraak","Друг","Kun je vrijdag?","Nee, vrijdag kan ik niet. Zaterdag wel.",["Ja, ik woon in Nederland.","Vrijdag is een biertje.","Nee, dank je wel, prima!"]]
+];
+const VERBS=[ // [sentence, answers, translation, infinitive]
+ ["Ik ___ moe.","ben","Я устал.","zijn"],["Jij ___ te laat.","bent","Ты опоздал.","zijn"],["Hij ___ thuis.","is","Он дома.","zijn"],["Wij ___ in Amsterdam.","zijn","Мы в Амстердаме.","zijn"],
+ ["___ u meneer De Vries?","bent","Вы господин Де Врис?","zijn"],["Ik ___ dorst.","heb","Я хочу пить (у меня жажда).","hebben"],["___ je tijd?","heb","У тебя есть время?","hebben"],
+ ["Zij ___ een kat.","heeft","У неё есть кошка.","hebben"],["Wij ___ honger.","hebben","Мы голодны.","hebben"],["Ik ___ graag een biertje.","wil","Я бы хотел пиво.","willen"],
+ ["Wat ___ jij drinken?","wil","Что ты хочешь пить?","willen"],["Jij ___ een koffie, toch?","wilt|wil","Ты хочешь кофе, да?","willen"],["Wij ___ betalen.","willen","Мы хотим заплатить.","willen"],
+ ["___ ik pinnen?","kan","Можно оплатить картой?","kunnen"],["Ik ___ morgen niet.","kan","Я завтра не могу.","kunnen"],["Jij ___ goed Nederlands spreken!","kunt|kan","Ты хорошо говоришь по-нидерландски!","kunnen"],
+ ["___ u dat herhalen?","kunt","Можете повторить?","kunnen"],["Wij ___ vrijdag.","kunnen","Мы можем в пятницу.","kunnen"]
+];
+const VERB_TIP={zijn:"zijn: ik ben, jij bent, hij is, wij/jullie/zij zijn, u bent.",hebben:"hebben: ik heb, jij hebt, hij heeft, wij/jullie/zij hebben.",willen:"willen: ik wil, jij wilt, hij wil, wij/jullie/zij willen.",kunnen:"kunnen: ik kan, jij kunt (или kan), hij kan, wij/jullie/zij kunnen."};
+const INV_TIP="Глагол стоит перед je/jij — окончание -t пропадает.";
+
+const GAMES={
+ mix:{nm:"Микс",ic:"🏆",d:"15 разных вопросов по выбранным темам",big:true},
+ words:{nm:"Что это значит?",ic:"🧠",d:"Нидерландский → русский"},
+ reverse:{nm:"Как сказать?",ic:"💡",d:"Русский → нидерландский"},
+ hoeren:{nm:"На слух",ic:"🎧",d:"Слушаете — выбираете перевод"},
+ spell:{nm:"Напишите",ic:"✍️",d:"Русский → пишете по-нидерландски"},
+ dialog:{nm:"Ответьте",ic:"💬",d:"Бармен, сосед, друг — что ответить?"},
+ num:{nm:"Числа и цены",ic:"🔢",d:"На слух и по написанию"},
+ time:{nm:"Который час?",ic:"🕒",d:"half vier, kwart over…"},
+ verbs:{nm:"Глаголы",ic:"⚙️",d:"ik ben, jij hebt, wij willen…"},
+ tricky:{nm:"Мои ошибки",ic:"🎯",d:"То, что пока путается"}
+};
+
+/* ======================= STATE ======================= */
+const KEY="mike-nl";
+const DEF={xp:0,streak:0,last:"",days:{},types:{},items:{},rounds:0,best:{},sel:["groet","gaat","beleefd"],rate:.9};
+let S; try{S=Object.assign({},DEF,JSON.parse(localStorage.getItem(KEY))||{});}catch(e){S=Object.assign({},DEF);}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+const $=s=>document.querySelector(s), app=$("#app");
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const rnd=a=>a[Math.floor(Math.random()*a.length)];
+const shuf=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
+const pad=n=>String(n).padStart(2,"0");
+const dayKey=d=>d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
+
+let voice=null;
+function loadVoice(){try{const v=speechSynthesis.getVoices();voice=v.find(x=>x.lang==="nl-NL")||v.find(x=>/^nl/i.test(x.lang))||null;}catch(e){}}
+try{loadVoice();speechSynthesis.onvoiceschanged=loadVoice;}catch(e){}
+function say(t){try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang="nl-NL";if(voice)u.voice=voice;u.rate=S.rate||.9;speechSynthesis.speak(u);}catch(e){}}
+
+const ALL=UNITS.flatMap(u=>u.items.map(([nl,ru,tip])=>({nl,ru,tip:tip||"",u:u.id})));
+const BYNL={}; ALL.forEach(x=>{ if(!BYNL[x.nl]) BYNL[x.nl]=x; });
+const unitOf=id=>UNITS.find(u=>u.id===id);
+
+function track(q,ok){
+  const d=dayKey(new Date()), D=S.days[d]=S.days[d]||{q:0,ok:0}; D.q++; if(ok) D.ok++;
+  const T=S.types[q.type]=S.types[q.type]||{q:0,ok:0}; T.q++; if(ok) T.ok++;
+  const I=S.items[q.key]=S.items[q.key]||{w:0,r:0,l:q.label,t:q.type,ref:q.ref}; if(ok) I.r++; else I.w++; I.l=q.label;
+  const today=new Date().toDateString();
+  if(S.last!==today){ const y=new Date(); y.setDate(y.getDate()-1); S.streak=S.last===y.toDateString()?S.streak+1:1; S.last=today; }
+  if(ok) S.xp++;
+  save();
+}
+function mastery(u){ const its=u.items; let m=0; its.forEach(([nl])=>{ ["w:","r:","h:","s:"].some(p=>{const I=S.items[p+nl]; return I&&I.r>I.w;})&&m++; }); return Math.round(m/its.length*100); }
+
+/* ======================= QUESTION BUILDERS ======================= */
+function selItems(){ const s=ALL.filter(x=>S.sel.includes(x.u)); return s.length?s:ALL.filter(x=>x.u==="groet"); }
+function distract(ans,field,pool,n=3){
+  const out=[], seen=new Set([ans[field]]);
+  for(const src of [shuf(pool.filter(x=>x.u===ans.u)),shuf(pool),shuf(ALL)]) for(const x of src){ if(out.length>=n) break; if(!seen.has(x[field])){seen.add(x[field]);out.push(x[field]);} }
+  return out;
+}
+function mkWord(type,it,pool){
+  pool=pool||ALL;
+  if(type==="words") return {type,key:"w:"+it.nl,ref:it.nl,label:`${it.nl} = ${it.ru}`,ctx:"Что это значит?",prompt:it.nl,nl:true,speak:it.nl,auto:true,opts:shuf([it.ru,...distract(it,"ru",pool)]),ans:it.ru,tip:it.tip};
+  if(type==="hoeren") return {type,key:"h:"+it.nl,ref:it.nl,label:`🎧 ${it.nl} = ${it.ru}`,ctx:"Послушайте и выберите перевод",prompt:"",listen:true,speak:it.nl,auto:true,opts:shuf([it.ru,...distract(it,"ru",pool)]),ans:it.ru,reveal:it.nl,tip:it.tip};
+  if(type==="reverse") return {type,key:"r:"+it.nl,ref:it.nl,label:`${it.ru} → ${it.nl}`,ctx:"Как это сказать по-нидерландски?",prompt:it.ru,opts:shuf([it.nl,...distract(it,"nl",pool)]),ans:it.nl,after:it.nl,tip:it.tip};
+  if(type==="spell") return {type,key:"s:"+it.nl,ref:it.nl,label:`${it.ru} → ${it.nl}`,ctx:"Напишите по-нидерландски",prompt:it.ru,typed:true,ans:it.nl,after:it.nl,tip:it.tip};
+}
+function mkDialog(i){ const [u,who,cue,right,wrong]=DIALOG[i];
+  return {type:"dialog",key:"d:"+i,ref:i,label:`«${cue}» → ${right}`,ctx:`${who} говорит:`,prompt:cue,nl:true,speak:cue,auto:true,task:"Что вы ответите?",opts:shuf([right,...wrong]),ans:right,after:right};
+}
+function priceText(e,c){ return `${numWord(e)} euro${c?" "+numWord(c):""}`; }
+function mkNum(ref){ // ref: "h:47" hear number, "p:47" pick word, "e:4,50" hear price
+  const [m,v]=ref.split(":");
+  if(m==="h"){ const n=+v; return {type:"num",key:"n:"+ref,ref,label:`${numWord(n)} = ${n}`,ctx:"Послушайте и напишите число цифрами",listen:true,speak:numWord(n),auto:true,typed:true,digits:true,ans:String(n),reveal:numWord(n),tip:n>20&&n%10?"Сначала единицы, потом десятки.":""}; }
+  if(m==="p"){ const n=+v, sw=n>20&&n%10?(n%10)*10+Math.floor(n/10):null, c=new Set([numWord(n)]);
+    if(sw&&sw!==n&&sw<100) c.add(numWord(sw)); while(c.size<4){ const k=n>20?21+Math.floor(Math.random()*79):Math.floor(Math.random()*21); c.add(numWord(k)); }
+    return {type:"num",key:"n:"+ref,ref,label:`${n} = ${numWord(n)}`,ctx:"Как пишется это число?",prompt:String(n),opts:shuf([...c]),ans:numWord(n),after:numWord(n),tip:sw?"Сначала единицы, потом десятки.":""}; }
+  const [e,c]=v.split(",").map(Number); const txt=priceText(e,c);
+  return {type:"num",key:"n:"+ref,ref,label:`${txt} = ${v} €`,ctx:"Сколько это стоит? Напишите цифрами (например 4,50)",listen:true,speak:txt,auto:true,typed:true,digits:true,price:true,ans:v,reveal:txt};
+}
+function randNum(){ const r=Math.random();
+  if(r<.15){ const e=1+Math.floor(Math.random()*25), c=rnd([0,10,20,25,50,75,95]); return "e:"+e+","+(c?pad(c):"00"); }
+  const n=r<.4?Math.floor(Math.random()*21):r<.5?10*(2+Math.floor(Math.random()*8)):21+Math.floor(Math.random()*79);
+  return (Math.random()<.6?"h:":"p:")+n;
+}
+const HW=h=>NUMW[h]||["","","","","","","","","","","","elf","twaalf"][h];
+const nxt=h=>h%12+1;
+const TFORMS={uur:[h=>`${HW(h)} uur`,0,0],kwo:[h=>`kwart over ${HW(h)}`,0,15],half:[h=>`half ${HW(nxt(h))}`,0,30],kwv:[h=>`kwart voor ${HW(nxt(h))}`,0,45],tio:[h=>`tien over ${HW(h)}`,0,10],tiv:[h=>`tien voor ${HW(nxt(h))}`,0,50]};
+const clock=(h,m)=>`${h}:${pad(m)}`;
+function mkTime(ref){ const [h,f]=ref.split(":"), H=+h, F=TFORMS[f], txt=F[0](H), right=clock(H,F[2]);
+  const c=new Set([right]); if(f==="half"||f==="kwv"||f==="tiv") c.add(clock(nxt(H),F[2]));
+  if(f==="half") c.add(clock(nxt(H),0)); if(f==="kwo") c.add(clock(H,45)); if(f==="kwv") c.add(clock(H,15));
+  while(c.size<4) c.add(clock(rnd([H,nxt(H)]),rnd([0,10,15,30,45,50])));
+  const tip=f==="half"?`half ${HW(nxt(H))} = половина ${nxt(H)}-го = ${right}.`:f==="kwv"||f==="tiv"?`«voor» — «до»: без ${f==="kwv"?"четверти":"десяти"} ${nxt(H)}.`:"";
+  return {type:"time",key:"t:"+ref,ref,label:`${txt} = ${right}`,ctx:"Который час?",prompt:`Het is ${txt}.`,nl:true,speak:`Het is ${txt}.`,auto:true,opts:shuf([right,...[...c].filter(x=>x!==right).slice(0,3)]),ans:right,tip};
+}
+function randTime(){ return (1+Math.floor(Math.random()*12))+":"+rnd(Object.keys(TFORMS)); }
+function mkVerb(i){ const [s,a,ru,inf]=VERBS[i], inv=/^___|___ (je|jij)\b/.test(s);
+  return {type:"verbs",key:"v:"+i,ref:i,label:`${s.replace("___",a.split("|")[0])}`,ctx:`${ru}`,prompt:s.replace("___","<u>&nbsp;?&nbsp;</u>"),html:true,task:`Вставьте форму глагола <b>${inf}</b>`,typed:true,ans:a,after:s.replace("___",a.split("|")[0]),tip:(inv&&/jij|je\b/.test(s)?INV_TIP+" ":"")+VERB_TIP[inf]};
+}
+function rebuild(I){ const r=I.ref;
+  if(I.t==="dialog") return DIALOG[r]&&mkDialog(r); if(I.t==="verbs") return VERBS[r]&&mkVerb(r);
+  if(I.t==="num") return mkNum(r); if(I.t==="time") return mkTime(r);
+  const it=BYNL[r]; return it&&mkWord(I.t,it); }
+function makeRound(g){
+  const pool=selItems(), N=g==="mix"?15:10, out=[];
+  const wordQ=t=>{ let p=pool; if(t==="spell") p=pool.filter(x=>x.nl.split(" ").length<=5); return mkWord(t,rnd(p),pool); };
+  const dlg=()=>{ let ids=DIALOG.map((d,i)=>i).filter(i=>S.sel.includes(DIALOG[i][0])); if(ids.length<3) ids=DIALOG.map((d,i)=>i); return mkDialog(rnd(ids)); };
+  if(g==="tricky"){ return Object.values(S.items).filter(x=>x.w>0&&x.w>x.r-1).sort((a,b)=>(b.w-b.r*.5)-(a.w-a.r*.5)).slice(0,N).map(rebuild).filter(Boolean); }
+  const used=new Set();
+  for(let k=0;k<N*4&&out.length<N;k++){
+    let t=g; if(g==="mix"){ const opts=["words","reverse","hoeren","spell","dialog"]; if(S.sel.includes("getal")) opts.push("num","num"); if(S.sel.includes("prijs")) opts.push("time"); if(S.sel.includes("werkw")) opts.push("verbs","verbs"); t=rnd(opts); }
+    const q=t==="dialog"?dlg():t==="num"?mkNum(randNum()):t==="time"?mkTime(randTime()):t==="verbs"?mkVerb(Math.floor(Math.random()*VERBS.length)):wordQ(t);
+    if(q&&!used.has(q.key)){ used.add(q.key); out.push(q); }
+  }
+  return out;
+}
+
+/* ======================= CHECKING ======================= */
+const norm=s=>s.toLowerCase().replace(/[.,!?¿¡"«»“”:;]/g," ").replace(/[’`]/g,"'").replace(/\s+/g," ").trim();
+const flat=s=>s.normalize("NFD").replace(/[̀-ͯ]/g,"");
+function check(inp,q){
+  if(q.digits){ const v=inp.replace(/[€\s]/g,"").replace(".",","); const a=q.ans; if(q.price){ const [e,c]=v.split(","); const [ae,ac]=a.split(","); return +e===+ae&&+(c||0)===+ac?"ok":"bad"; } return v===a?"ok":"bad"; }
+  const answers=q.ans.split("|"), n=norm(inp);
+  if(answers.some(a=>norm(a)===n)) return "ok";
+  if(answers.some(a=>flat(norm(a))===flat(n))) return "accent";
+  return "bad";
+}
+
+/* ======================= VIEWS ======================= */
+let R=null;
+function home(){
+  speechSynthesis&&speechSynthesis.cancel&&speechSynthesis.cancel();
+  const d=S.days[dayKey(new Date())]||{q:0}, tr=Object.values(S.items).filter(x=>x.w>0&&x.w>x.r-1).length;
+  const alive=S.last===new Date().toDateString()||(()=>{const y=new Date();y.setDate(y.getDate()-1);return S.last===y.toDateString();})();
+  app.innerHTML=`<div class="top"><div><h1>🇳🇱 Nederlands · basis</h1><div class="sub">Самое нужное: приветствия, бар, числа, дни, время</div></div>
+   <div class="stats"><div class="stat"><b>${d.q}</b><span>сегодня</span></div><div class="stat"><b>${alive?S.streak:0}</b><span>дней подряд</span></div><div class="stat"><b>${S.xp}</b><span>верных</span></div></div></div>
+   <h2>1. Программа — выберите темы для тренировки</h2>
+   <div class="units">${UNITS.map(u=>`<div class="unit${S.sel.includes(u.id)?" on":""}" data-u="${u.id}" role="button" tabindex="0" aria-pressed="${S.sel.includes(u.id)}">
+     <button class="lrn" data-l="${u.id}" title="Карточки: выучить слова">📖</button>
+     <div class="wk">${u.wk}</div><div class="nm">${esc(u.nm)}</div><div class="ru">${esc(u.ru)} · ${u.items.length}</div><div class="bar"><i style="width:${mastery(u)}%"></i></div></div>`).join("")}</div>
+   <p class="hint">Новую тему начните с карточек 📖 — прослушайте каждую фразу и повторите вслух. Потом включите тему и тренируйтесь. Зелёная полоска — сколько фраз уже усвоено.</p>
+   <h2>2. Тренировки</h2>
+   <div class="games">${Object.entries(GAMES).map(([k,g])=>`<button class="game${g.big?" big":""}" data-g="${k}"><span class="ic">${g.ic}</span><span><b>${g.nm}${k==="tricky"&&tr?` · ${tr}`:""}</b><small>${g.d}</small>${S.best[k]!=null?`<small>лучший раунд: ${S.best[k]}%</small>`:""}</span></button>`).join("")}</div>
+   <div class="set">Скорость речи: <input type="range" min=".6" max="1.1" step=".05" value="${S.rate}" id="rate"> <button class="btn sec" id="test">🔊 Hoe gaat het?</button>${voice?"":"<span>Нидерландский голос не найден — будет голос по умолчанию.</span>"}</div>`;
+  app.querySelectorAll("[data-u]").forEach(el=>{ const tog=()=>{ const id=el.dataset.u; if(S.sel.includes(id)){ if(S.sel.length>1) S.sel=S.sel.filter(x=>x!==id);} else S.sel.push(id); save(); home(); };
+    el.onclick=e=>{ if(e.target.closest(".lrn")) return; tog(); }; el.onkeydown=e=>{ if(e.key==="Enter"||e.key===" "){e.preventDefault();tog();} }; });
+  app.querySelectorAll("[data-l]").forEach(b=>b.onclick=()=>cards(b.dataset.l));
+  app.querySelectorAll("[data-g]").forEach(b=>b.onclick=()=>start(b.dataset.g));
+  $("#rate").oninput=e=>{S.rate=+e.target.value;save();}; $("#test").onclick=()=>say("Hoe gaat het?");
+}
+function cards(id){
+  const u=unitOf(id); let i=0, open=false; const list=u.items;
+  const draw=()=>{ const [nl,ru,tip]=list[i];
+    app.innerHTML=`<div class="bar2"><button class="btn sec" id="back">← Назад</button><div class="prog"><i style="width:${(i+1)/list.length*100}%"></i></div><span class="sub">${i+1}/${list.length}</span></div>
+    <h2 style="margin-top:0">${esc(u.nm)} · ${esc(u.ru)}</h2>${u.note?`<div class="note">${u.note}</div>`:""}
+    <div class="cardv" id="cv"><div class="nl">${esc(nl)}</div>${open?`<div class="tr">${esc(ru)}</div>${tip?`<div class="tp">${esc(tip)}</div>`:""}`:`<div class="tp">нажмите, чтобы увидеть перевод</div>`}</div>
+    <div class="row" style="justify-content:space-between"><button class="btn sec" id="prev" ${i?"":"disabled"}>←</button><button class="btn sec" id="spk">🔊 Ещё раз</button><button class="btn" id="next">${i<list.length-1?"Дальше →":"Готово ✓"}</button></div>
+    <p class="hint">Клавиши: пробел — перевод, → дальше, ← назад, S — озвучить.</p>`;
+    $("#back").onclick=home; $("#cv").onclick=()=>{open=!open;draw();}; $("#spk").onclick=()=>say(nl);
+    $("#prev").onclick=()=>{ if(i){i--;open=false;draw();say(list[i][0]);} };
+    $("#next").onclick=()=>{ if(i<list.length-1){i++;open=false;draw();say(list[i][0]);} else { if(!S.sel.includes(id)){S.sel.push(id);save();} home(); } };
+  };
+  document.onkeydown=e=>{ if(!$("#cv")) return; if(e.key===" "){e.preventDefault();$("#cv").click();} else if(e.key==="ArrowRight") $("#next").click(); else if(e.key==="ArrowLeft") $("#prev").click(); else if(e.key.toLowerCase()==="s") $("#spk").click(); };
+  draw(); say(list[0][0]);
+}
+function start(g){
+  const qs=makeRound(g);
+  if(!qs.length){ app.innerHTML=`<div class="res"><div class="big">🎉</div><p>Ошибок для повторения пока нет. Отлично!</p><button class="btn" id="hm">На главную</button></div>`; $("#hm").onclick=home; return; }
+  R={g,qs,i:0,ok:0,mist:[],done:false}; draw();
+}
+function draw(){
+  const q=R.qs[R.i]; R.done=false;
+  const pr=q.listen?`<button class="say huge" id="spk" title="Прослушать">🔊</button>`:`${q.html?q.prompt:esc(q.prompt)}${q.speak?` <button class="say" id="spk" title="Прослушать">🔊</button>`:""}`;
+  app.innerHTML=`<div class="bar2"><button class="btn sec" id="back">✕</button><div class="prog"><i style="width:${R.i/R.qs.length*100}%"></i></div><span class="sub">${R.i+1}/${R.qs.length}</span></div>
+   <div class="q"><div class="ctx">${esc(q.ctx)}</div><div class="prompt${q.nl||q.listen||q.html?"":" ruP"}">${pr}</div>${q.task?`<div class="task">${q.task}</div>`:""}
+   ${q.typed?`<div class="row"><input class="ans" id="inp" autocomplete="off" autocapitalize="off" spellcheck="false" ${q.digits?'inputmode="decimal"':""} placeholder="${q.digits?"цифрами":"ответ"}"><button class="btn" id="go">Проверить</button><button class="btn sec" id="idk">Не знаю</button></div>
+     ${q.digits?"":`<div class="keys">${["ë","é","ij"].map(k=>`<button data-k="${k}">${k}</button>`).join("")}</div>`}`
+   :`<div class="opts">${q.opts.map((o,j)=>`<button class="opt" data-o="${esc(o)}"><span class="k">${j+1}</span>${esc(o)}</button>`).join("")}<button class="opt" data-o="" style="color:var(--mute)"><span class="k">0</span>Не знаю</button></div>`}
+   <div id="fb"></div></div>`;
+  $("#back").onclick=()=>{ if(R.i>0) finish(); else home(); };
+  if($("#spk")) $("#spk").onclick=()=>say(q.speak);
+  if(q.auto) setTimeout(()=>say(q.speak),250);
+  if(q.typed){ const inp=$("#inp"); inp.focus();
+    app.querySelectorAll("[data-k]").forEach(b=>b.onclick=()=>{const s=inp.selectionStart,e=inp.selectionEnd; inp.value=inp.value.slice(0,s)+b.dataset.k+inp.value.slice(e); inp.focus(); inp.setSelectionRange(s+b.dataset.k.length,s+b.dataset.k.length);});
+    $("#go").onclick=()=>{ if(!inp.value.trim()) return inp.focus(); answer(check(inp.value,q),inp.value); };
+    $("#idk").onclick=()=>answer("bad","");
+  } else app.querySelectorAll("[data-o]").forEach(b=>b.onclick=()=>{ if(R.done) return; const v=b.dataset.o; app.querySelectorAll("[data-o]").forEach(x=>{ x.disabled=true; if(x.dataset.o===q.ans) x.classList.add("right"); else if(x===b) x.classList.add("wrong"); }); answer(v===q.ans?"ok":"bad",v); });
+}
+function answer(res,given){
+  if(R.done) return; R.done=true; const q=R.qs[R.i], ok=res!=="bad";
+  track(q,ok); if(ok) R.ok++; else R.mist.push(q);
+  if(q.after) say(q.after); else if(q.reveal&&!ok) say(q.speak);
+  const right=q.ans.split("|")[0], shown=q.typed?(q.digits&&q.price?right+" €":right):right;
+  const extra=[q.reveal?`Звучало: <b>${esc(q.reveal)}</b>`:"", q.type==="verbs"?`<b>${esc(q.after)}</b>`:"", q.tip?esc(q.tip):""].filter(Boolean).join("<br>");
+  $("#fb").innerHTML=`<div class="fb ${ok?"ok":"bad"}">${ok?(res==="accent"?`✓ Почти идеально: правильно пишется <b>${esc(right)}</b>.`:"✓ Верно!"):`✗ Правильно: <b>${esc(shown)}</b>`}${extra?`<div class="tip">${extra}</div>`:""}</div>
+    <div class="row"><button class="btn" id="nx">${R.i<R.qs.length-1?"Дальше →":"Итог"}</button>${q.speak?`<button class="btn sec" id="sp2">🔊</button>`:""}</div>`;
+  if($("#inp")){ $("#inp").disabled=true; $("#go").disabled=true; $("#idk").disabled=true; }
+  $("#nx").onclick=next; if($("#sp2")) $("#sp2").onclick=()=>say(q.after||q.speak); $("#nx").focus();
+}
+function next(){ R.i++; if(R.i>=R.qs.length) finish(); else draw(); }
+function finish(){
+  const n=R.i+(R.done&&R.i<R.qs.length?1:0); if(!n) return home();
+  const p=Math.round(R.ok/n*100); S.rounds++; if(n>=5) S.best[R.g]=Math.max(S.best[R.g]||0,p); save();
+  app.innerHTML=`<div class="res"><div class="big">${R.ok} / ${n}</div><p>${p>=90?"Uitstekend! 🎉":p>=70?"Goed gedaan! 👍":"Oefening baart kunst — повторение мать учения 💪"}</p>
+    ${R.mist.length?`<ul class="mist">${R.mist.map(q=>`<li>${esc(q.label)}</li>`).join("")}</ul><p class="hint">Эти вопросы попадут в «Мои ошибки».</p>`:""}
+    <div class="row" style="justify-content:center"><button class="btn" id="again">Ещё раунд</button><button class="btn sec" id="hm">На главную</button></div></div>`;
+  $("#again").onclick=()=>start(R.g); $("#hm").onclick=home; R.done=true; R.i=R.qs.length;
+}
+document.addEventListener("keydown",e=>{
+  if(!R||!$(".q")) return;
+  if(e.key==="Enter"){ if(R.done&&$("#nx")){ e.preventDefault(); $("#nx").click(); } else if($("#go")&&document.activeElement===$("#inp")){ e.preventDefault(); $("#go").click(); } return; }
+  if(!R.done&&!$("#inp")&&/^[0-4]$/.test(e.key)){ const b=app.querySelectorAll("[data-o]")[e.key==="0"?app.querySelectorAll("[data-o]").length-1:+e.key-1]; b&&b.click(); }
+});
+home();
+</script>
+</body>
+</html>
