@@ -349,15 +349,33 @@ const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(M
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const norm=s=>s.normalize("NFC").replace(/[’‘`´]/g,"'").replace(/\s+/g," ").replace(/\s+([,.!?])/g,"$1").replace(/,(\S)/g,", $1").replace(/\.(\p{L})/gu,". $1").trim();
 const loose=s=>norm(s).toLowerCase().replace(/ä/g,"ae").replace(/ö/g,"oe").replace(/ü/g,"ue").replace(/ß/g,"ss");
-function check(input,answer){ // returns 'ok' | 'case' | 'umlaut' | 'bad'
-  if(answer.includes(" / ")){ const rs=[answer.replace(/ \/ /g,"/"),...answer.split(" / ")].map(a=>check(input.replace(/\s*\/\s*/g,"/"),a)); return rs.includes("ok")?"ok":rs.includes("case")?"case":rs.includes("umlaut")?"umlaut":"bad"; }
+function check(input,answer,strict){ // 'ok' | 'case' | 'umlaut' | 'punct' | 'bad'. strict = punctuation counts (sentence-writing games)
+  if(answer.includes(" / ")){ const rs=[answer.replace(/ \/ /g,"/"),...answer.split(" / ")].map(a=>check(input.replace(/\s*\/\s*/g,"/"),a,strict)); return rs.includes("ok")?"ok":rs.includes("punct")?"punct":rs.includes("case")?"case":rs.includes("umlaut")?"umlaut":"bad"; }
   const a=norm(input), b=norm(answer);
   if(a===b) return "ok";
-  const sp=x=>x.replace(/[.!?]$/,"");
-  if(sp(a)===sp(b)) return "ok";
-  if(sp(a).toLowerCase()===sp(b).toLowerCase()) return "case";
-  if(sp(loose(a))===sp(loose(b))) return "umlaut";
+  const bare=x=>x.replace(/(?<!\d)[.,!?;:¡¿]/g," ").replace(/\s+/g," ").trim(); // keeps the dot in "4." dates
+  if(strict){
+    if(bare(a)===bare(b)) return "punct";
+    if(bare(a).toLowerCase()===bare(b).toLowerCase()) return "case";
+  } else {
+    if(bare(a)===bare(b)) return "ok";
+    if(bare(a).toLowerCase()===bare(b).toLowerCase()){
+      // a capital after a sentence end inside the answer only follows from punctuation, which doesn't count here
+      const ta=bare(a).split(" "), tb=b.split(" ").filter(w=>bare(w)), te=tb.map((w,i)=>i>0&&/[.!?]$/.test(tb[i-1]));
+      return tb.length===ta.length&&tb.every((w,i)=>bare(w)===ta[i]||te[i])?"ok":"case";
+    }
+  }
+  if(bare(loose(a))===bare(loose(b))) return "umlaut";
   return "bad";
+}
+function punctTip(v,right){
+  const a=norm(v), endR=right.trim().slice(-1), endA=a.slice(-1);
+  const inner=x=>(x.slice(0,-1).match(/(?<!\d)[.!?]/g)||[]).length;
+  if(inner(right)>inner(a)) return "two sentences → put a full stop between them.";
+  if(endR==="?"&&endA!=="?") return "it's a question → it ends with a question mark <b>?</b>";
+  if(/[.!?]/.test(endR)&&!/[.!?]/.test(endA)) return "don't forget the full stop <b>.</b> at the end!";
+  if(endR==="."&&endA!==".") return "this is not a question → it ends with a full stop <b>.</b>";
+  return "check the commas and full stops.";
 }
 let deVoice=null, allVoices=[];
 function loadVoice(){ try{ allVoices=speechSynthesis.getVoices();
@@ -789,11 +807,12 @@ function typeWire(right, extraTip, shown, isDate, isCaps){
   const inp=$("#inp"); wireKeys(); setTimeout(()=>inp.focus(),50);
   const go=()=>{
     if(G.answered) return; const v=inp.value; if(!v.trim()) return;
-    const r=check(v,right); shown=shown||right;
+    const r=check(v,right,isCaps); shown=shown||right;
     say(shown.replace(/^\d+ = /,""));
     if(r==="ok") return result(true,`${rnd(["Super!","Perfect!","Klopt!","Heel goed!"])} <span class="ans">${esc(shown)}</span>`);
     if(r==="umlaut") return result(true,`Almost perfect! Use the special letters ä ö ü ß: <span class="ans">${esc(shown)}</span>`);
-    if(r==="case") return result(false,`So close — check the <b>capital letters</b>! <span class="ans">${esc(shown)}</span>`);
+    if(r==="case") return result(false,`So close — check the <b>capital letters</b>!${isCaps&&norm(v).replace(/[^.,!?]/g,"")!==norm(right).replace(/[^.,!?]/g,"")?" And "+punctTip(v,right):""} <span class="ans">${esc(shown)}</span>`);
+    if(r==="punct") return result(false,`So close — ${punctTip(v,right)} <span class="ans">${esc(shown)}</span>`);
     let extra="";
     if(isDate){ extra=dateTip(v,right); }
     result(false,`Not quite. The answer is: <span class="ans">${esc(shown)}</span>${extra}${extraTip?`<div style="margin-top:6px;font-weight:700">${extraTip}</div>`:""}`);
