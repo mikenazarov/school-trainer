@@ -118,6 +118,7 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--pen);outline-offset
   <section id="parent" hidden style="display:flex;flex-direction:column;gap:14px">
     <h2>Прогресс Филиппа <span class="ru">· Progress</span></h2>
     <p class="sync">Данные приходят со всех устройств, где Филипп занимается через эту страницу. Сверху — сводка, ниже — навыки (слабые первыми) и слова, в которых он чаще ошибается.</p>
+    <p class="sync" id="pfresh"></p>
     <div class="rep" id="rep"></div>
   </section>
 
@@ -216,10 +217,18 @@ async function fetchRemote(){
   try{
     const rows=await rpc("get_progress",{p_code:CODE})||[];
     rows.forEach(r=>{ remote[r.subject]={keys:r.keys,updatedAt:Number(r.updated_at)}; });
-    dbState="on"; TR.forEach(pull); render();
+    dbState="on"; TR.forEach(pull); render(); lastFetch=Date.now();
   }catch(e){ dbState="err"; }
-  note();
+  note(); fresh();
 }
+/* parents' view: show when the data was last fetched, refresh on demand */
+let lastFetch=0;
+function fresh(){ const el=$("pfresh"); if(!el) return;
+  if(!db){ el.textContent=""; return; }
+  const t=lastFetch?new Date(lastFetch).toLocaleTimeString("ru-RU",{hour:"2-digit",minute:"2-digit",second:"2-digit"}):"—";
+  el.innerHTML=`Данные обновлены в <b>${t}</b> · обновляются каждые 20 секунд, пока открыт этот раздел. Математика попадает в отчёт после окончания тренировки, языки — после каждого ответа (с задержкой до ~15 секунд). <button id="prefresh" style="font:inherit;cursor:pointer;border:1px solid currentColor;background:none;border-radius:6px;padding:1px 8px">↻ Обновить</button>`;
+  $("prefresh").onclick=()=>fetchRemote(); }
+setInterval(()=>{ if(!current&&!$("parent").hidden&&document.visibilityState==="visible") fetchRemote(); },20000);
 async function initDb(){
   if(!CFG.url||!CFG.key){ dbState="nocfg"; note(); return; }
   if(!CODE){ dbState="nocode"; note(); return; }
@@ -382,7 +391,7 @@ $("close").onclick=closeT;
 /* ---------- tabs ---------- */
 function tab(p){ $("tabLearn").setAttribute("aria-pressed",String(!p)); $("tabParent").setAttribute("aria-pressed",String(p)); $("learn").hidden=p; $("parent").hidden=!p;
   try{ sessionStorage.setItem("hub-tab",p?"parent":"learn"); }catch(e){} }
-$("tabLearn").onclick=()=>tab(false); $("tabParent").onclick=()=>tab(true);
+$("tabLearn").onclick=()=>tab(false); $("tabParent").onclick=()=>{ tab(true); fetchRemote(); };
 try{ if(sessionStorage.getItem("hub-tab")==="parent") tab(true); }catch(e){}
 
 render(); note(); initDb();
