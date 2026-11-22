@@ -226,6 +226,7 @@ const DIALOG=[
  {q:"___ bist du?",a:"Wer",o:["Wer","Woher","Wie"]},
  {q:"___ ist das Mädchen?",a:"Wer",o:["Wer","Wie","Woher"]},
  {q:"___ schreibt man das?",a:"Wie",o:["Wie","Wer","Woher"]},
+ {q:"___ wohnst du?",a:"Wo",o:["Wo","Wer","Woher"]},
  {q:"Wie heißt du?",a:"Ich heiße Julian.",o:["Ich heiße Julian.","Aus Berlin.","Das ist Nina."]},
  {q:"Woher kommst du?",a:"Aus Berlin.",o:["Aus Berlin.","Ich heiße Julian.","Keine Ahnung."]},
  {q:"Wer ist das Mädchen?",a:"Das ist Nina.",o:["Das ist Nina.","Aus Zürich.","Ich bin Nina."]},
@@ -246,16 +247,37 @@ const DIALOG=[
  {q:"🌅 It's 8 am. You say: ___",a:"Guten Morgen!",o:["Guten Morgen!","Guten Abend!","Gute Nacht!"]},
  {q:"👋 You are leaving. You say: ___",a:"Tschüss!",o:["Tschüss!","Hallo!","Bitte!"]}
 ];
+/* Klassenarbeit 1 (Nov 2026): months came out in French/English, a month instead of a season */
+const MONTH_FR=["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"];
+const MONTH_TYPO=["Januer","Februr","Merz","Aprill","Mei","Junie","Julie","Augusst","Septembre","Oktobre","Novembre","Dezembre"];
+const WEAK_MONTHS=[0,1,4,7,8,9,11];
+const SEASON_OF=m=>["der Winter","der Frühling","der Sommer","der Herbst"][Math.floor(((m+1)%12)/3)];
+const SEASON_LIST=["der Frühling","der Sommer","der Herbst","der Winter"];
+function monatQ(mode,m){ return {type:"monat",mode,m}; }
+function monatRound(n){ const modes=["write","write","write","next","next","pick","pick","when","when","jz"], out=[], seen=new Set();
+  for(let k=0;out.length<n&&k<60;k++){ const mode=rnd(modes), m=Math.random()<.7?rnd(WEAK_MONTHS):Math.floor(Math.random()*12), key=mode+(mode==="jz"?"":m);
+    if(!seen.has(key)){ seen.add(key); out.push(monatQ(mode,m)); } } return out; }
+function reviewQuestions(){ return shuffle([
+  monatQ("write",0),monatQ("write",1),monatQ("pick",4),monatQ("next",7),monatQ("write",8),monatQ("pick",9),monatQ("write",11),monatQ("jz",2),
+  {type:"artikel",n:NOUNS.find(n=>n.w==="Sporttasche")},
+  {type:"verbs",s:[1,"heißen","Ich heiße Max. Und wie","du?"],mode:"type"},
+  {type:"dialog",d:DIALOG.find(d=>d.q==="___ wohnst du?")},
+  {type:"verbs",s:[1,"wohnen","Wo","du?"],mode:"type"},
+  {type:"hoeren",say:"Hallo, ich heiße Anne.",ask:"What is the girl's name?",a:"Anne",o:["Anna","Anne","Antje"]},
+  {type:"caps",c:"die gitarre ist super und tennis ist cool."},
+  {type:"satz",s:"Du spielst Gitarre, oder?"}]); }
 const CAPS=[
  "das foto ist cool.","der rucksack ist toll.","spielst du tennis?","ich komme aus berlin.","woher kommst du?","wer ist der junge?",
  "ich heiße fabian.","das mädchen ist süß.","die gitarre ist super.","ich spiele fußball.","heute ist montag.","im winter ist es kalt.",
- "das ist anna. sie kommt aus köln.","ich bin filipp und ich komme aus russland.","das fahrrad ist blau."
+ "das ist anna. sie kommt aus köln.","ich bin filipp und ich komme aus russland.","das fahrrad ist blau.",
+ "die gitarre ist super und tennis ist cool.","ich spiele gitarre und tennis."
 ];
 const CAPS_FIX={"das foto ist cool.":"Das Foto ist cool.","der rucksack ist toll.":"Der Rucksack ist toll.","spielst du tennis?":"Spielst du Tennis?",
  "ich komme aus berlin.":"Ich komme aus Berlin.","woher kommst du?":"Woher kommst du?","wer ist der junge?":"Wer ist der Junge?","ich heiße fabian.":"Ich heiße Fabian.",
  "das mädchen ist süß.":"Das Mädchen ist süß.","die gitarre ist super.":"Die Gitarre ist super.","ich spiele fußball.":"Ich spiele Fußball.","heute ist montag.":"Heute ist Montag.",
  "im winter ist es kalt.":"Im Winter ist es kalt.","das ist anna. sie kommt aus köln.":"Das ist Anna. Sie kommt aus Köln.",
- "ich bin filipp und ich komme aus russland.":"Ich bin Filipp und ich komme aus Russland.","das fahrrad ist blau.":"Das Fahrrad ist blau."};
+ "ich bin filipp und ich komme aus russland.":"Ich bin Filipp und ich komme aus Russland.","das fahrrad ist blau.":"Das Fahrrad ist blau.",
+ "die gitarre ist super und tennis ist cool.":"Die Gitarre ist super und Tennis ist cool.","ich spiele gitarre und tennis.":"Ich spiele Gitarre und Tennis."};
 
 
 /* ---------------- EXPLANATIONS (shown after a wrong answer) ---------------- */
@@ -264,7 +286,7 @@ const DLG_EN={"Wie heißt du?":"What's your name?","Ich heiße Julian.":"My name
  "Und wer ist der Junge?":"And who is the boy?","Keine Ahnung.":"No idea.","Du spielst Gitarre, oder?":"You play guitar, right?","Ja, klar!":"Yes, of course!",
  "Vielen Dank!":"Thank you very much!","Bitte!":"You're welcome!","Okay, tschüss!":"Okay, bye!","Bis bald!":"See you soon!","Hi! Wie heißt du?":"Hi! What's your name?",
  "Ich heiße Sandra.":"My name is Sandra.","Ich komme aus Russland.":"I come from Russia.","Wo wohnst du?":"Where do you live?","Ich wohne in Rotterdam.":"I live in Rotterdam.",
- "Wie schreibt man das?":"How do you spell that?","L – I – L – L – Y.":"(spelling the name letter by letter)"};
+ "Wie schreibt man das?":"How do you spell that?","Wo wohnst du?":"Where do you live?","L – I – L – L – Y.":"(spelling the name letter by letter)"};
 const GENDER={der:"masculine",das:"neuter",die:"feminine"};
 const NOUN_TIP={Junge:"A boy is male → der Junge (even though it ends in -e).",Mädchen:"Words ending in -chen are ALWAYS das → das Mädchen (even though it's a girl!).",
  Lampe:"Many nouns ending in -e are die: die Lampe, die Gitarre, die Sporttasche.",Gitarre:"Many nouns ending in -e are die: die Lampe, die Gitarre, die Sporttasche.",
@@ -279,7 +301,8 @@ function explain(q){
   switch(q.type){
   case "words": return `“${esc(q.it.de)}” means “${esc(q.it.en)}”.`+articleNote(q.it.de);
   case "spell": return `“${esc(q.it.en)}” in German is <b>${esc(q.it.de)}</b>.`+articleNote(q.it.de)+(/[äöüß]/.test(q.it.de)?" Use the special letters (ä ö ü ß) — tap the buttons under the box.":"");
-  case "hoeren": return q.ask.startsWith("You hear a question")?`The question was “${esc(q.say)}” = “${esc(DLG_EN[q.say])}”. Answer: “${esc(q.a)}” = “${esc(DLG_EN[q.a]||q.a)}”.`:`“${esc(q.say)}” means “${esc(q.a)}”.`;
+  case "hoeren": if(q.ask==="What is the girl's name?") return `Listen to the end of the name: Ann<b>e</b> ends with an “e” sound, Ann<b>a</b> with an “a”, and Antje has a “t” in the middle. You hear each recording twice — use the second time to check.`;
+    return q.ask.startsWith("You hear a question")?`The question was “${esc(q.say)}” = “${esc(DLG_EN[q.say])}”. Answer: “${esc(q.a)}” = “${esc(DLG_EN[q.a]||q.a)}”.`:`“${esc(q.say)}” means “${esc(q.a)}”.`;
   case "artikel": { const n=q.n; return `${esc(n.w)} (${esc(n.en)}) is ${GENDER[n.g]} → <b>${n.g} ${esc(n.w)}</b>. ${NOUN_TIP[n.w]||""}`; }
   case "verbs": { const [pi,v,b]=q.s, f=VERBS[v].f[pi];
     const a=q.s[3], who=pi===0?"ich":pi===1?"du":`“${/wer$/i.test(b)?a.replace(/[?.!]$/,""):b}” = er / sie / es`;
@@ -292,7 +315,7 @@ function explain(q){
     if(d.q.includes("___")){ if(/^[😍🙄🥰😐]/u.test(d.q)) return `Look at the face: 😍 = you love it → super / toll / cool · 🙄 = you don't like it → blöd · 🥰 = sweet → süß · 😐 = so-so → Hm, ja.`;
       if(/^[🌙🌅]/u.test(d.q)) return `Guten Morgen = good morning · Guten Tag = hello (daytime) · Guten Abend = good evening · Gute Nacht = good night (before bed).`;
       if(/^👋/u.test(d.q)) return `Tschüss! = Bye! · Bis bald! = See you soon! · Hallo! = Hello! (when you arrive).`;
-      return `Wer = who (a person) · Wie = how · Woher = where from. ${d.q.replace("___",d.a)} = “${esc(DLG_EN[d.q.replace("___",d.a)]||"")}”`.replace(/ = “”$/,""); }
+      return `Wer = who (a person) · Wie = how · Wo = where · Woher = where from. ${d.q.replace("___",d.a)} = “${esc(DLG_EN[d.q.replace("___",d.a)]||"")}”`.replace(/ = “”$/,""); }
     let t=`“${esc(d.q)}” = “${esc(DLG_EN[d.q]||d.q)}” → “${esc(d.a)}” = “${esc(DLG_EN[d.a]||d.a)}”.`;
     if(d.a==="Ich komme aus Russland.") t+=" With <b>ich</b> it's komm<b>e</b> — “ich kommst” is wrong, -st is only for du.";
     if(d.q==="Wo wohnst du?") t+=" Wo = where → answer with <b>in</b> + city. (Aus = from, for Woher?)";
@@ -300,7 +323,12 @@ function explain(q){
   case "caps": { const ans=CAPS_FIX[q.c], words=ans.split(" "), list=[];
     words.forEach((w,i)=>{ const clean=w.replace(/[.,!?]/g,""); if(clean[0]!==clean[0].toUpperCase()||clean[0]===clean[0].toLowerCase()) return;
       const start=i===0||/[.!?]$/.test(words[i-1]); list.push(`<b>${esc(clean)}</b> (${start?"start of sentence":PROPER.has(clean)?"name":"noun"})`); });
-    return `Big letters here: ${list.join(", ")}. In German ALL nouns start with a capital letter, plus names and the first word of a sentence.`; }
+    return `Big letters here: ${list.join(", ")}. In German ALL nouns start with a capital letter, plus names and the first word of a sentence.`+(/\b(super|cool|toll|blöd|süß|interessant)\b/.test(ans)?" Words like super, cool, toll, blöd stay <b>small</b> — they describe something, they are not nouns.":""); }
+  case "monat": { const m=q.m;
+    if(q.mode==="jz") return `The 4 seasons (Jahreszeiten) are <b>der Frühling, der Sommer, der Herbst, der Winter</b>. März, Juli, Oktober… are months (Monate), not seasons.`;
+    if(q.mode==="when") return `${MONTHS[m]} is in <b>${SEASON_OF(m)}</b>. Frühling: März, April, Mai · Sommer: Juni, Juli, August · Herbst: September, Oktober, November · Winter: Dezember, Januar, Februar.`;
+    const fr=MONTH_FR[m], extra={0:"Janu<b>ar</b> — like Febru<b>ar</b>.",1:"Febru<b>ar</b> — with <b>b</b> and -ar.",4:"M<b>ai</b> with “ai” (English May, French mai).",7:"A<b>u</b>gust with “au” — it comes after Juli.",8:"Septemb<b>er</b> — German ends in -er, not -re.",9:"Okto<b>ber</b> with <b>k</b> and -ber, not -bre.",11:"De<b>z</b>emb<b>er</b> with <b>z</b> and -ber."}[m]||"";
+    return `${MONTHS_EN[m]} = <b>${MONTHS[m]}</b> (in French it's “${fr}” — don't mix them up!). ${extra} All 12: Januar, Februar, März, April, Mai, Juni, Juli, August, September, Oktober, November, Dezember.`; }
   case "num": { const n=q.n, w=numWord(n);
     if(n<=12) return `${n} = <b>${w}</b>. Numbers 0–12 you just learn by heart.`;
     if(n<20) return `13–19 = small number + <b>zehn</b>: ${n} = ${numWord(n-10)} + zehn = <b>${w}</b>.${n===16?" Careful: sech-zehn (no s)!":n===17?" Careful: sieb-zehn (no -en)!":""}`;
@@ -424,7 +452,7 @@ const sfxWin=()=>tone([523,659,784,1047,1319],.14,"square",.08);
 
 /* ---------------- PROGRESS TRACKING & STATS ---------------- */
 const TYPE_NAME={words:"Word quiz",spell:"Spelling",hoeren:"Listening",lesen:"Reading",artikel:"der · das · die",verbs:"Verb forms",praep:"aus / in",
- dialog:"Questions & answers",caps:"Capital letters",num:"Numbers",datum:"Dates",abc:"Alphabet",satz:"Sentences"};
+ dialog:"Questions & answers",caps:"Capital letters",num:"Numbers",datum:"Dates",abc:"Alphabet",satz:"Sentences",monat:"Months & seasons"};
 const dayKey=d=>{d=d||new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");};
 function itemInfo(q){ // key + label + compact question for replay
   switch(q.type){
@@ -440,6 +468,8 @@ function itemInfo(q){ // key + label + compact question for replay
    case "abc": return {k:"b:"+q.name,l:`Spelling the name ${q.name}`,q};
    case "satz": return {k:"s:"+q.s,l:q.s,q};
    case "lesen": return {k:"l:"+q.q[0],l:`📖 ${q.q[0]}`,q};
+   case "monat": { const m=q.m, L={write:`${MONTHS_EN[m]} = ${MONTHS[m]}`,pick:`${MONTHS_EN[m]} = ${MONTHS[m]}`,next:`after ${MONTHS[(m+11)%12]} → ${MONTHS[m]}`,when:`${MONTHS[m]} → ${SEASON_OF(m)}`,jz:"Seasons: Frühling, Sommer, Herbst, Winter"};
+     return {k:"m:"+q.mode+(q.mode==="jz"?"":":"+m),l:L[q.mode],q}; }
   } return null; }
 function track(q,ok){
   if(!q) return; const dk=dayKey(); const d=S.days[dk]=S.days[dk]||{q:0,ok:0}; d.q++; if(ok) d.ok++;
@@ -503,7 +533,9 @@ const GAMES={
  datum:{name:"Write the date",ic:"📆",col:"#ffb3dc",desc:"Mittwoch, den 4. November"},
  dialog:{name:"Who? How? Where from?",ic:"💬",col:"#8ee8f2",desc:"Questions and answers"},
  caps:{name:"Capital letters",ic:"🔠",col:"#e8d6b0",desc:"Fix the sentence"},
- test:{name:"Test mix · Wed 4 Nov",ic:"🏆",col:"#ff9f43",desc:"15 mixed questions, like the real test"},
+ test:{name:"Test mix",ic:"🏆",col:"#ff9f43",desc:"15 mixed questions, like a real test"},
+ review:{name:"Klassenarbeit 1 · fix my mistakes",ic:"📝",col:"#ffd6a5",desc:"The questions you got wrong in the test, 15 in a row"},
+ monate:{name:"Months & seasons",ic:"🗓️",col:"#c3f0ca",desc:"Januar … Dezember · Frühling … Winter"},
  hoeren:{name:"Listening",ic:"🎧",col:"#b8a8ff",desc:"Hear it, pick the meaning"},
  lesen:{name:"Reading",ic:"📖",col:"#a8f0c0",desc:"Read a short text, answer"},
  abc:{name:"Alphabet",ic:"🔤",col:"#ffaad4",desc:"Wie schreibt man das?"},
@@ -523,9 +555,9 @@ function home(){
    <div class="stats"><span class="pill" title="Coins collected">🪙 ${S.xp}</span><span class="pill" title="Days in a row">📅 ${S.streak}</span><button class="pill" id="statsBtn" title="My progress">📊 Stats</button><button class="pill" id="sfxBtn" title="Sound effects">${S.sfx===false?"🔕":"🔔"}</button>${canSpeak?`<button class="pill" id="voiceBtn" title="Voice settings">🔊</button>`:""}</div></header>
   <div class="hero">${MASCOT}<div class="bubble" id="bubble">${esc(rnd(BREZI))}</div></div>
   ${(()=>{const L=levelInfo();return `<div class="lvl"><b>Lv ${L.n} · ${L.title}</b><div class="bar"><i style="width:${L.pct}%"></i></div><span style="white-space:nowrap;font-size:.85rem">${L.left} 🪙 to next</span></div>`})()}
-  <div class="grid">${tile("test",stars("test"))}</div>
+  <div class="grid">${tile("review",stars("review"))}${tile("test",stars("test"))}</div>
   <h2>Practise</h2>
-  <div class="grid">${["artikel","verbs","praep","dialog",canSpeak?"hoeren":null,"lesen","abc","satz","numbers","caps","datum"].filter(Boolean).map(k=>tile(k,stars(k))).join("")}</div>
+  <div class="grid">${["monate","artikel","verbs","praep","dialog",canSpeak?"hoeren":null,"lesen","abc","satz","numbers","caps","datum"].filter(Boolean).map(k=>tile(k,stars(k))).join("")}</div>
   <h2>Words</h2>
   <div class="chips" id="chips">${Object.entries(TOPICS).map(([k,t])=>`<button class="chip ${selTopics.has(k)?"on":""}" data-t="${k}">${t.ic} ${t.name}</button>`).join("")}</div>
   <div class="grid" style="margin-top:12px">${["words","spell","cards"].map(k=>tile(k,stars(k))).join("")}</div>
@@ -562,7 +594,7 @@ function settings(){
   $("#rate").onchange=()=>say("Guten Tag!");
   $("#test").onclick=()=>say("Ich heiße Filipp. Ich komme aus Russland.");
 }
-function tile(k,st){const g=GAMES[k];return `<button class="tile${k==="test"?" big":""}" data-g="${k}" style="background:#e9edf2"><span class="ic">${g.ic}</span><span><b>${g.name}</b><span>${g.desc}</span>${st?`<span class="best">${st}</span>`:""}</span></button>`;}
+function tile(k,st){const g=GAMES[k];return `<button class="tile${k==="test"||k==="review"?" big":""}" data-g="${k}" style="background:#e9edf2"><span class="ic">${g.ic}</span><span><b>${g.name}</b><span>${g.desc}</span>${st?`<span class="best">${st}</span>`:""}</span></button>`;}
 
 function pool(){return [...selTopics].flatMap(t=>TOPICS[t].items.map(x=>Object.assign({t},x)));}
 
@@ -584,6 +616,8 @@ function makeQuestions(g){
   if(g==="lesen") return shuffle(READ.flatMap(r=>r.q.map(q=>({type:"lesen",t:r.t,q})))).slice(0,N);
   if(g==="hoeren") return Array.from({length:N},()=>hoerenQ());
   if(g==="tricky") return trickyQuestions();
+  if(g==="monate") return monatRound(N);
+  if(g==="review") return reviewQuestions();
   if(g==="test"){
     const all=Object.values(TOPICS).flatMap(t=>t.items.map(x=>({t:t.name,...x}))).filter(x=>x.t!=="Numbers 0–31"||+x.en<=20);
     const mk={
@@ -598,9 +632,10 @@ function makeQuestions(g){
       lesen:()=>{const r=rnd(READ);return{type:"lesen",t:r.t,q:rnd(r.q)}},
       satz:()=>({type:"satz",s:rnd(ORDER)}),
       abc:()=>({type:"abc",name:rnd(NAMES),mode:canSpeak?"hear":"read"}),
-      hoeren:hoerenQ
+      hoeren:hoerenQ,
+      monat:()=>monatRound(1)[0]
     };
-    let kinds=["artikel","verbs","verbs","dialog","praep","caps","num","words","spell","lesen","lesen","satz","abc"];
+    let kinds=["artikel","verbs","verbs","dialog","praep","caps","num","words","spell","lesen","satz","abc","monat"];
     if(canSpeak) kinds.push("hoeren","hoeren"); else kinds.push("words","dialog");
     const seen=new Set(), qs=[];
     for(const k of shuffle(kinds)){ let q, tries=0; do{ q=mk[k](); tries++; }while(seen.has(JSON.stringify(q))&&tries<10); seen.add(JSON.stringify(q)); qs.push(q); }
@@ -764,6 +799,27 @@ function render(){
     html=`<div class="q"><div class="hint">${gap?"Which question word?":"What is the best answer?"}</div><div class="emoji">💬</div><div class="big" style="font-size:1.7rem">${esc(d.q)}</div>${gap?"":sayBtn(d.q)}</div>
       <div class="opts ${gap?"three":""}">${shuffle(d.o).map(o=>`<button class="opt" data-v="${esc(o)}">${esc(o)}</button>`).join("")}</div>${fbHTML}`;
     after=()=>pickWire(d.a, gap?d.q.replace("___",d.a):d.a, esc(gap?d.q.replace("___",d.a):d.q+" — "+d.a));
+  }
+  else if(q.type==="monat"){
+    const m=q.m, M=MONTHS[m];
+    if(q.mode==="write"||q.mode==="next"){
+      const prev=MONTHS[(m+11)%12];
+      html=`<div class="q"><div class="hint">${q.mode==="write"?"Write the month in German":"Which month comes next?"}</div><div class="emoji">🗓️</div>
+        <div class="big">${q.mode==="write"?esc(MONTHS_EN[m]):`${esc(prev)} → ?`}</div></div>
+        <input class="inp" id="inp" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="in German…">${keysHTML}<button class="btn next" id="go">Check</button>${fbHTML}
+        <div class="tip">German, not French or English! Months start with a capital letter.</div>`;
+      after=()=>typeWire(M,"",q.mode==="write"?`${MONTHS_EN[m]} = ${M}`:`${prev} → ${M}`);
+    } else {
+      let hint, big="", opts, right, shown;
+      if(q.mode==="pick"){ hint=`How do you write “${MONTHS_EN[m]}” in German?`; right=M; shown=`${MONTHS_EN[m]} = ${M}`;
+        const o=new Set([M,MONTH_TYPO[m],MONTH_FR[m][0].toUpperCase()+MONTH_FR[m].slice(1),MONTHS_EN[m]]); while(o.size<4) o.add(MONTH_TYPO[Math.floor(Math.random()*12)]); opts=[...o].slice(0,4); }
+      else if(q.mode==="when"){ hint="In which season (Jahreszeit) is it?"; big=M; right=SEASON_OF(m); shown=`${M} → ${right}`; opts=SEASON_LIST; }
+      else { hint="Which one is a season (eine Jahreszeit)?"; right=rnd(SEASON_LIST); shown=`${right} = a season`;
+        opts=[right,...shuffle(MONTHS.filter((x,i)=>i!==m)).slice(0,2),M]; }
+      html=`<div class="q"><div class="hint">${esc(hint)}</div><div class="emoji">${q.mode==="pick"?"🗓️":"🌷☀️🍁⛄"}</div>${big?`<div class="big">${esc(big)}</div>`:""}</div>
+        <div class="opts">${shuffle(opts).map(o=>`<button class="opt" data-v="${esc(o)}">${esc(o)}</button>`).join("")}</div>${fbHTML}`;
+      after=()=>pickWire(right,right,esc(shown));
+    }
   }
   else if(q.type==="caps"){
     const ans=CAPS_FIX[q.c];
