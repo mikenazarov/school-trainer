@@ -181,10 +181,17 @@ const TOPICS={
   ["la pizza","pizza","🍕"],["la musique","music","🎵"],["le foot","football","⚽"],["le basket","basketball","🏀"],["les insectes","insects","🐞"],["le shopping","shopping","🛍️"],["le français","French (the subject)","🇫🇷"],
   ["Qu'est-ce que tu aimes ?","What do you like?"],["Qu'est-ce que tu n'aimes pas ?","What don't you like?"]]},
  vocab:{name:"Verbes & questions",ic:"❓",items:[
-  ["jouer","to play","🎲"],["parler","to talk","🗣️"],["écouter","to listen","🎧"],["regarder","to watch / look at","📺"],["manger","to eat","🍽️"],["avoir","to have","🤲"],
+  ["jouer","to play","🎲"],["parler","to speak / talk","🗣️"],["écouter","to listen","🎧"],["regarder","to watch / look at","📺"],["manger","to eat","🍽️"],["avoir","to have","🤲"],
   ["avec","with","🤝"],["ensemble","together","👫"],["parce que","because"],["la mode","fashion / style","👗"],["le groupe","band / group","🎸"],["dans","in","📦"],
   ["il y a","there is / there are"],["il n'y a pas de","there is no / there are no"],
-  ["qui ?","who?"],["comment ?","how?"],["quand ?","when?","⏰"],["où ?","where?","📍"],["pourquoi ?","why?"],["qu'est-ce que… ?","what…?"],["est-ce que… ?","do you…? (yes/no question)"]]}
+  ["qui ?","who?"],["comment ?","how?"],["quand ?","when?","⏰"],["où ?","where?","📍"],["pourquoi ?","why?"],["qu'est-ce que… ?","what…?"],["est-ce que… ?","do you…? (yes/no question)"]]},
+ nat:{name:"Nationalités & pays (18–20 Nov)",ic:"🌍",items:[
+  ["russe","Russian","🇷🇺"],["suisse","Swiss","🇨🇭"],["belge","Belgian","🇧🇪"],["français","French (boy)","🇫🇷"],["française","French (girl)","🇫🇷"],
+  ["anglais","English (boy)","🇬🇧"],["néerlandais","Dutch (boy)","🇳🇱"],["japonais","Japanese (boy)","🇯🇵"],["indien","Indian (boy)","🇮🇳"],["indienne","Indian (girl)","🇮🇳"],["pakistanais","Pakistani (boy)","🇵🇰"],
+  ["la Russie","Russia (the country)"],["la France","France (the country)"],["les Pays-Bas","the Netherlands (the country)"],
+  ["un garçon","a boy","👦"],["une fille","a girl","👧"],["un élève","a pupil (boy)","🎒"],["une élève","a pupil (girl)","🎒"],
+  ["le nom","surname (last name)"],["le prénom","first name"],["l'âge","age"],["le pays","country","🌍"],["la ville","city / town","🏙️"],
+  ["je suis","I am"],["J'habite à Rotterdam.","I live in Rotterdam.","🏠"],["Je parle anglais.","I speak English.","🗣️"],["Elle a onze ans.","She is eleven."]]}
 };
 Object.values(TOPICS).forEach(t=>t.items=t.items.map(([de,en,e])=>({de,en,e:e||""})));
 
@@ -196,6 +203,8 @@ const PERS=["je (j')","tu","il / elle","nous","vous","ils / elles"];
 const er=st=>[st+"e",st+"es",st+"e",st+"ons",st+"ez",st+"ent"];
 const VERBS={
  avoir:{en:"to have",f:["ai","as","a","avons","avez","ont"]},
+ être:{en:"to be",f:["suis","es","est","sommes","êtes","sont"]},
+ habiter:{en:"to live",f:er("habit")},
  "s'appeler":{en:"to be called",f:["m'appelle","t'appelles","s'appelle","nous appelons","vous appelez","s'appellent"]},
  jouer:{en:"to play",f:er("jou")},
  aimer:{en:"to like",f:er("aim")},
@@ -203,7 +212,7 @@ const VERBS={
  détester:{en:"to hate",f:er("détest")},
  écouter:{en:"to listen",f:er("écout")},
  regarder:{en:"to watch",f:er("regard")},
- parler:{en:"to talk",f:er("parl")},
+ parler:{en:"to speak",f:er("parl")},
  manger:{en:"to eat",f:["mange","manges","mange","mangeons","mangez","mangent"]}
 };
 const SENT=[ // [person, verb, before, after] — the school test: tu joues, nous jouons, elle écoute, Max aime, ils ont
@@ -213,6 +222,9 @@ const SENT=[ // [person, verb, before, after] — the school test: tu joues, nou
  [5,"jouer","Ils","au basket."],[5,"regarder","Elles","la télévision."],[4,"écouter","Vous","de la musique."],[1,"avoir","Tu","un cahier bleu."],[2,"avoir","Elle","douze ans."],
  [0,"s'appeler","Je","Filipp."],[1,"s'appeler","Comment tu","?"],[2,"s'appeler","Il","Xavier."],[2,"s'appeler","Comment elle","?"],[0,"détester","Je","les insectes."],
  [0,"adorer","J'","les bonbons."],[3,"parler","Nous","français."],[4,"jouer","Vous","ensemble ?"],[5,"avoir","Elles","trois trousses."],[3,"avoir","Nous","un chat."],
+[0,"être","Je","un garçon."],[1,"être","Tu","suisse ?"],[2,"être","Elle","indienne."],[3,"être","Nous","russes."],[4,"être","Vous","français ?"],[5,"être","Ils","belges."],
+ [0,"être","Je","élève à RISS."],[2,"être","Il","néerlandais."],[0,"habiter","J'","à Rotterdam."],[2,"habiter","Elle","à Paris."],[1,"habiter","Tu","où ?"],[3,"habiter","Nous","à Rotterdam."],
+ [0,"parler","Je","anglais."],[2,"parler","Il","néerlandais et anglais."],[2,"avoir","Elle","onze ans."],
 [2,"jouer","Elle","avec ses copines."],[4,"regarder","Vous","la télé ?"],[5,"aimer","Ils","la pizza."],[1,"écouter","Tu","de la musique ?"]
 ];
 const NAMES=["Max","Léa","Xavier","Chloé","Tom","Emma","Hugo","Lina","Lucas","Inès","Filipp","Jules","Manon","Nathan"];
@@ -264,6 +276,33 @@ const DIALOG=[
  {q:"🤝 You meet someone for the first time: ___",a:"Enchanté !",o:["Enchanté !","À demain !","Allô ?"]},
  {q:"🎩 You ask a grown-up politely how they are: ___",a:"Comment allez-vous ?",o:["Comment allez-vous ?","Coucou !","Salut !"]}
 ];
+/* 18 & 20 Nov: être, nationalities, j'habite à + city. Notebook mistakes: "Je habite", "Elle habite Rotterdam", "Elle onze ans", "Pays: Russes" */
+const BG="Boy or girl? A girl adds <b>-e</b>: français → français<b>e</b>, anglais → anglais<b>e</b>, indien → indien<b>ne</b>. Words already ending in -e stay the same: russe, suisse, belge.";
+const NAT=[
+ {q:"Je ___ un garçon.",a:"suis",o:["suis","es","est"],ex:"être: je <b>suis</b>, tu es, il/elle est, nous sommes, vous êtes, ils/elles sont."},
+ {q:"Tu ___ suisse ?",a:"es",o:["es","est","suis"],ex:"être: je suis, tu <b>es</b>, il/elle est — tu es ends in -s, il est in -t."},
+ {q:"Elle ___ indienne.",a:"est",o:["est","es","a"],ex:"être: il/elle <b>est</b>."},
+ {q:"Nous ___ russes.",a:"sommes",o:["sommes","sont","êtes"],ex:"être: nous <b>sommes</b>, vous êtes, ils sont."},
+ {q:"Vous ___ français ?",a:"êtes",o:["êtes","sommes","sont"],ex:"être: vous <b>êtes</b> (with ê)."},
+ {q:"Ils ___ belges.",a:"sont",o:["sont","sommes","est"],ex:"être: ils/elles <b>sont</b>."},
+ {q:"👦 Je suis ___ garçon.",a:"un",o:["un","une"],ex:"un garçon (boy) · une fille (girl) · un élève / une élève."},
+ {q:"👧 Je suis ___ fille.",a:"une",o:["une","un"],ex:"une fille (girl) · un garçon (boy)."},
+ {q:"👧 Elle est ___. (Indian)",a:"indienne",o:["indienne","indien","Inde"],ex:BG},
+ {q:"👦 Il est ___. (French)",a:"français",o:["français","française","France"],ex:BG},
+ {q:"👧 Elle est ___. (French)",a:"française",o:["française","français","France"],ex:BG},
+ {q:"👧 Elle est ___. (Russian)",a:"russe",o:["russe","russie","Russie"],ex:BG},
+ {q:"👦 Il est ___. (Dutch)",a:"néerlandais",o:["néerlandais","néerlandaise","Pays-Bas"],ex:BG},
+ {q:"👧 Elle est ___. (English)",a:"anglaise",o:["anglaise","anglais","Angleterre"],ex:BG},
+ {q:"Pays : ___ (Russia)",a:"la Russie",o:["la Russie","russe","Russes"],ex:"<b>Pays</b> = the country → <b>la Russie</b>. <b>russe</b> is the nationality (Je suis russe). The country has a capital letter, the nationality doesn't."},
+ {q:"J'habite ___ Rotterdam.",a:"à",o:["à","au","de"],ex:"Where you live → <b>à</b> + city: J'habite <b>à</b> Rotterdam, à Paris."},
+ {q:"Elle habite ___ Paris.",a:"à",o:["à","de","la"],ex:"Don't forget <b>à</b> before the city: Elle habite <b>à</b> Paris."},
+ {q:"___ habite à Rotterdam.",a:"J'",o:["J'","Je","Jé"],ex:"Before a vowel or h, <b>je</b> becomes <b>j'</b>: <b>J'habite</b>, j'ai, j'aime — never “je habite”."},
+ {q:"Elle ___ onze ans.",a:"a",o:["a","est","as"],ex:"Age uses <b>avoir</b>, not être: elle <b>a</b> onze ans, j'ai onze ans (literally “she has eleven years”)."},
+ {q:"Je parle ___. (English)",a:"anglais",o:["anglais","Angleterre","anglaise"],ex:"Je parle + language: the language is the boy's form, small letter: je parle <b>anglais</b>, français, néerlandais, russe."},
+ {q:"Tu habites où ?",a:"J'habite à Rotterdam.",o:["J'habite à Rotterdam.","Je suis russe.","J'ai onze ans."],ex:"Tu habites où ? = Where do you live? → J'habite <b>à</b> + city."},
+ {q:"Tu es de quelle nationalité ?",a:"Je suis russe.",o:["Je suis russe.","J'habite à Russie.","Je parle Russie."],ex:"Nationality → Je suis + nationality: Je suis <b>russe</b>."},
+ {q:"Tu parles quelles langues ?",a:"Je parle russe et anglais.",o:["Je parle russe et anglais.","Je suis anglais.","J'habite en anglais."],ex:"Je parle + languages: Je parle russe et anglais."}
+];
 const NEG=[ // [positive, correct negative, wrong, wrong]
  ["Je joue aux jeux vidéo.","Je ne joue pas aux jeux vidéo.","Je ne pas joue aux jeux vidéo.","Je joue ne pas aux jeux vidéo."],
  ["J'aime le foot.","Je n'aime pas le foot.","Je ne aime pas le foot.","Je n'aime le foot pas."],
@@ -302,10 +341,11 @@ const accentNote=s=>/[éèêàçâôûîëïù]/.test(s)?" Watch the accents (é
 function articleNote(de){ const m=de.match(/^(le|la|les) (.+)$/); if(!m) return "";
   return ` <b>${m[1]}</b> = ${GENDER[m[1]]}${m[1]==="les"?"":` (a/an: <b>${m[1]==="le"?"un":"une"}</b>)`}. Always learn a noun with le or la.`; }
 function verbRule(pi,v){
+  if(v==="être") return `<b>être</b> (to be) is irregular — learn it by heart: je <b>suis</b>, tu <b>es</b>, il/elle <b>est</b>, nous <b>sommes</b>, vous <b>êtes</b>, ils/elles <b>sont</b>. Age is NOT être: elle <b>a</b> onze ans (avoir).`;
   if(v==="avoir") return `<b>avoir</b> (to have) is irregular — learn it by heart: j'<b>ai</b>, tu <b>as</b>, il/elle <b>a</b>, nous <b>avons</b>, vous <b>avez</b>, ils/elles <b>ont</b>.`;
   if(v==="s'appeler") return `s'appeler: je <b>m'appelle</b>, tu <b>t'appelles</b>, il/elle <b>s'appelle</b> — double <b>ll</b>, and tu ends in <b>-s</b>.`;
   const st=v.slice(0,-2), end=["e","es","e","ons","ez","ent"][pi];
-  let t=`<b>${v}</b> is an -er verb: take away <b>-er</b> → <b>${st}</b>, then add the ending for ${PERS[pi]}: <b>-${end}</b>. (je -e, tu -es, il/elle -e, nous -ons, vous -ez, ils/elles -ent)`;
+  let t=(v==="habiter"&&pi===0?"Before a vowel or h, je becomes <b>j'</b>: <b>J'habite</b> (not “je habite”). ":"")+`<b>${v}</b> is an -er verb: take away <b>-er</b> → <b>${st}</b>, then add the ending for ${PERS[pi]}: <b>-${end}</b>. (je -e, tu -es, il/elle -e, nous -ons, vous -ez, ils/elles -ent)`;
   if(v==="manger"&&pi===3) t+=" Careful: nous mang<b>e</b>ons keeps the e so it sounds soft.";
   if(pi===1) t+=" The -s of tu is silent, but you must write it!";
   if(pi===5) t+=" The -ent of ils/elles is silent, but you must write it!";
@@ -330,7 +370,7 @@ function explain(q){
     if(/n'/.test(c)) t+=` Before a vowel (a, e, i, o, u, h) <b>ne</b> becomes <b>n'</b>: je n'aime, je n'ai, il n'y a.`;
     if(/\b(un|une|des)\b/.test(p)&&/pas de\b|pas d'/.test(c)) t+=` After <b>pas</b>, un / une / des become <b>de</b>: J'ai un cahier → Je n'ai pas <b>de</b> cahier.`;
     return t; }
-  case "dialog": { const d=q.d;
+  case "dialog": { const d=q.d; if(d.ex) return d.ex;
     if(d.q.includes("___")){ const full=d.q.replace("___",d.a);
       if(/^[🌇👋📞🤝🎩]/u.test(d.q)) return `Bonjour = hello (daytime) · Bonsoir = good evening · Allô = hello on the phone · Enchanté = nice to meet you · Au revoir = goodbye · Comment allez-vous ? = how are you (polite).`;
       if(d.a==="mais"||d.a==="parce que") return `<b>mais</b> = but · <b>parce que</b> = because · <b>et</b> = and · <b>avec</b> = with.`;
@@ -528,6 +568,7 @@ const GAMES={
  cards:{name:"Flip cards",ic:"🃏",col:"#cdbcff",desc:"Learn words, no score",topics:true},
  artikel:{name:"le · la · les",ic:"🎯",col:"#7ce8a8",desc:"le / la / les, un / une"},
  verbs:{name:"Verb forms",ic:"⚙️",col:"#ff9e9e",desc:"tu joues, nous jouons, ils ont…"},
+ nat:{name:"Je suis… · J'habite à…",ic:"🌍",col:"#c3f0ca",desc:"être, nationalities, j'habite à + city"},
  caps:{name:"Colours agree",ic:"🎨",col:"#e8d6b0",desc:"vert, verte, verts, vertes"},
  praep:{name:"mon · ma · mes",ic:"🎒",col:"#9cd0ff",desc:"my, your, his / her"},
  neg:{name:"ne … pas",ic:"🚫",col:"#ffb3b3",desc:"Je n'aime pas…"},
@@ -555,7 +596,7 @@ function home(){
   ${(()=>{const L=levelInfo();return `<div class="lvl"><b>Lv ${L.n} · ${L.title}</b><div class="bar"><i style="width:${L.pct}%"></i></div><span style="white-space:nowrap;font-size:.85rem">${L.left} 🪙 to next</span></div>`})()}
   <div class="grid">${tile("test",stars("test"))}</div>
   <h2>Practise</h2>
-  <div class="grid">${["verbs","artikel","caps","praep","neg","dialog",canSpeak?"hoeren":null,"lesen","satz","numbers","datum","abc"].filter(Boolean).map(k=>tile(k,stars(k))).join("")}</div>
+  <div class="grid">${["nat","verbs","artikel","caps","praep","neg","dialog",canSpeak?"hoeren":null,"lesen","satz","numbers","datum","abc"].filter(Boolean).map(k=>tile(k,stars(k))).join("")}</div>
   <h2>Words</h2>
   <div class="chips" id="chips">${Object.entries(TOPICS).map(([k,t])=>`<button class="chip ${selTopics.has(k)?"on":""}" data-t="${k}">${t.ic} ${t.name}</button>`).join("")}</div>
   <div class="grid" style="margin-top:12px">${["words","spell","cards"].map(k=>tile(k,stars(k))).join("")}</div>
@@ -603,6 +644,7 @@ function makeQuestions(g){
     return g==="cards"?list:list.slice(0,N).map(it=>({type:g,it,dir:Math.random()<.5?"de":"en",p}));
   }
   if(g==="artikel") return shuffle(NOUNS.concat(shuffle(NOUNS))).slice(0,N).map(n=>({type:"artikel",n,indef:n.g!=="les"&&Math.random()<.35}));
+  if(g==="nat") return shuffle(NAT).slice(0,N).map(d=>({type:"dialog",d}));
   if(g==="verbs") return shuffle(SENT).slice(0,N).map(s=>({type:"verbs",s,mode:Math.random()<.5?"type":"pick"}));
   if(g==="numbers"){ for(let i=0;i<N;i++){const n=1+Math.floor(Math.random()*20); out.push({type:"num",n,mode:rnd(canSpeak?["hear","read","write"]:["read","write"])});} return out; }
   if(g==="datum"){ for(let i=0;i<N;i++){ const d=new Date(2026,Math.floor(Math.random()*12),1+Math.floor(Math.random()*28)); out.push({type:"datum",d,mode:i%2?"rel":"write",back:Math.random()<.4});} return out; }
@@ -620,6 +662,7 @@ function makeQuestions(g){
     const mk={
       artikel:()=>({type:"artikel",n:rnd(NOUNS),indef:Math.random()<.3}),
       neg:()=>({type:"neg",s:rnd(NEG)}),
+      nat:()=>({type:"dialog",d:rnd(NAT)}),
       verbs:()=>({type:"verbs",s:rnd(SENT),mode:rnd(["type","pick"])}),
       dialog:()=>({type:"dialog",d:rnd(DIALOG)}),
       praep:praepQ,
@@ -632,7 +675,7 @@ function makeQuestions(g){
       abc:()=>({type:"abc",name:rnd(NAMES),mode:canSpeak?"hear":"read"}),
       hoeren:hoerenQ
     };
-    let kinds=["artikel","verbs","verbs","verbs","dialog","dialog","praep","caps","neg","num","words","spell","lesen"];
+    let kinds=["artikel","verbs","verbs","verbs","dialog","nat","nat","praep","caps","neg","num","words","spell","lesen"];
     if(canSpeak) kinds.push("hoeren","hoeren"); else kinds.push("words","dialog");
     const seen=new Set(), qs=[];
     for(const k of shuffle(kinds)){ let q, tries=0; do{ q=mk[k](); tries++; }while(seen.has(JSON.stringify(q))&&tries<10); seen.add(JSON.stringify(q)); qs.push(q); }

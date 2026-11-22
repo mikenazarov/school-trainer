@@ -2512,12 +2512,47 @@ const G0={
  hcf(){return G1.hcf()}
 };
 
+/* week 5: polygons & quadrilaterals (3.5–3.6, 20 Nov) */
+const POLY=[[3,'triangle','треугольник'],[4,'quadrilateral','четырёхугольник'],[5,'pentagon','пятиугольник'],[6,'hexagon','шестиугольник'],[7,'heptagon','семиугольник'],
+ [8,'octagon','восьмиугольник'],[9,'nonagon','девятиугольник'],[10,'decagon','десятиугольник'],[12,'dodecagon','двенадцатиугольник']];
+const POLY_EX=XS(B('The start of the name tells the number of sides: tri 3, quad 4, penta 5, hexa 6, hepta 7, octa 8 (octopus!), nona 9, deca 10, dodeca 12.','Начало слова — число сторон: tri 3, quad 4, penta 5, hexa 6, hepta 7, octa 8 (осьминог!), nona 9, deca 10, dodeca 12.'),
+ [B('Spelling: n-o-n-a-gon (not “nanagon”), d-e-c-a-gon, d-o-d-e-c-a-gon.','Написание: n-o-n-a-gon (не «nanagon»), d-e-c-a-gon, d-o-d-e-c-a-gon.')]);
+const QUADS=[{n:{en:'square',ru:'квадрат'},d:{en:'4 equal sides and 4 right angles',ru:'4 равные стороны и 4 прямых угла'}},
+ {n:{en:'rectangle',ru:'прямоугольник'},d:{en:'4 right angles, opposite sides equal, but not all 4 sides equal',ru:'4 прямых угла, противоположные стороны равны, но не все 4'}},
+ {n:{en:'rhombus',ru:'ромб'},d:{en:'4 equal sides but no right angles',ru:'4 равные стороны, но нет прямых углов'}},
+ {n:{en:'parallelogram',ru:'параллелограмм'},d:{en:'2 pairs of parallel sides, no right angles, not all sides equal',ru:'2 пары параллельных сторон, нет прямых углов, не все стороны равны'}},
+ {n:{en:'trapezium',ru:'трапеция'},d:{en:'exactly 1 pair of parallel sides',ru:'ровно 1 пара параллельных сторон'}},
+ {n:{en:'kite',ru:'дельтоид («воздушный змей»)'},d:{en:'2 pairs of equal sides that are next to each other, no parallel sides',ru:'2 пары равных соседних сторон, нет параллельных сторон'}}];
+const G5={
+ pname(){const p=PK(POLY),near=POLY.filter(x=>x!==p&&Math.abs(x[0]-p[0])<=3),opts=SH([p,...SH(near).slice(0,3)]);
+  return mkQ({t:'geom',type:'choice',a:opts.indexOf(p),q:{en:`A polygon has ${p[0]} sides. What is it called?`,ru:`У многоугольника ${p[0]} сторон. Как он называется?`},c:opts.map(x=>({en:x[1],ru:x[2]})),exObj:POLY_EX})},
+ psides(){const p=PK(POLY.filter(x=>x[0]>4));return mkQ({t:'geom',type:'num',a:p[0],q:{en:`How many sides does a ${p[1]} have?`,ru:`Сколько сторон у фигуры ${p[1]} (${p[2]})?`},exObj:POLY_EX})},
+ tri(){const k=RN(0,2);let a=RN(4,12),b=a,c=a;if(k===1){do{c=RN(3,2*a-1)}while(c===a)}if(k===2){do{b=RN(4,12);c=RN(Math.abs(a-b)+1,a+b-1)}while(b===a||c===a||c===b)}
+  const sides=SH([a,b,c]);return mkQ({t:'geom',type:'choice',a:[2,1,0][k],q:{en:`A triangle has sides ${sides.join(' cm, ')} cm. What type is it?`,ru:`Стороны треугольника — ${sides.join(' см, ')} см. Какой это треугольник?`},
+  c:[{en:'scalene',ru:'разносторонний'},{en:'isosceles',ru:'равнобедренный'},{en:'equilateral',ru:'равносторонний'}],
+  exObj:XS(B('Count the equal sides: all 3 equal → equilateral; at least 2 equal → isosceles; all different → scalene.','Считаем равные стороны: все 3 равны → равносторонний; хотя бы 2 → равнобедренный; все разные → разносторонний.'),[B(`Sides: ${sides.join(', ')}`,`Стороны: ${sides.join(', ')}`)])})},
+ quad(){const opts=SH(QUADS.slice()).slice(0,4),k=RN(0,3),ans=opts[k];
+  return mkQ({t:'geom',type:'choice',a:k,q:{en:`Which quadrilateral has ${ans.d.en}?`,ru:`У какого четырёхугольника ${ans.d.ru}?`},c:opts.map(o=>o.n),
+  exObj:XS(B('Check one by one: equal sides, right angles, parallel sides.','Проверяй по очереди: равные стороны, прямые углы, параллельные стороны.'),opts.map(o=>B(`${o.n.en}: ${o.d.en}`,`${o.n.ru}: ${o.d.ru}`)))})},
+ regular(){const S=[['A square is a regular polygon.','Квадрат — правильный многоугольник.',1,'All 4 sides and all 4 angles are equal.','Все 4 стороны и все 4 угла равны.'],
+   ['A rectangle is a regular polygon.','Прямоугольник — правильный многоугольник.',0,'Its angles are equal, but not all its sides.','Углы равны, но стороны — не все.'],
+   ['A rhombus is a regular polygon.','Ромб — правильный многоугольник.',0,'Its sides are equal, but not its angles.','Стороны равны, а углы — нет.'],
+   ['An equilateral triangle is a regular polygon.','Равносторонний треугольник — правильный многоугольник.',1,'3 equal sides and 3 equal angles (60° each).','3 равные стороны и 3 равных угла (по 60°).'],
+   ['A circle is a polygon.','Круг — это многоугольник.',0,'A polygon has only straight sides; a circle is curved.','У многоугольника только прямые стороны, а окружность кривая.'],
+   ['A polygon is always a closed shape.','Многоугольник — всегда замкнутая фигура.',1,'All sides join up, with no gaps.','Все стороны соединены, без разрывов.'],
+   ['A shape with one curved side can be a polygon.','Фигура с одной кривой стороной может быть многоугольником.',0,'Every side of a polygon must be straight.','Все стороны многоугольника должны быть прямыми.'],
+   ['The sides of a polygon may cross each other.','Стороны многоугольника могут пересекаться.',0,'In a simple polygon the sides only meet at the corners (vertices).','Стороны встречаются только в вершинах.']],
+   x=PK(S);return mkQ({t:'geom',type:'choice',a:x[2]?0:1,q:{en:`True or false? ${x[0]}`,ru:`Верно или нет? ${x[1]}`},c:[{en:'true',ru:'верно'},{en:'false',ru:'неверно'}],
+   exObj:XS(B('A polygon: closed, only straight sides. Regular: ALL sides equal AND ALL angles equal.','Многоугольник: замкнутый, только прямые стороны. Правильный: ВСЕ стороны равны И ВСЕ углы равны.'),[B(x[3],x[4])])})},
+ circ(){return G1.circle()}
+};
 const WEEKS=[
  {en:'Warm-up: speed',ru:'Разминка на скорость',g:G0},
  {en:'Week 1: angles, shapes, HCF',ru:'Неделя 1: углы, фигуры, НОД',g:G1},
  {en:'Week 2: fractions',ru:'Неделя 2: дроби',g:G2},
  {en:'Week 3: decimals',ru:'Неделя 3: десятичные',g:G3},
- {en:'Week 4: percentages & ratio',ru:'Неделя 4: проценты и пропорции',g:G4}
+ {en:'Week 4: percentages & ratio',ru:'Неделя 4: проценты и пропорции',g:G4},
+ {en:'Week 5: polygons & quadrilaterals',ru:'Неделя 5: многоугольники и четырёхугольники',g:G5}
 ];
 const PLEN=10;
 let pq=[],pi=0,pw=0,pRight=0,pStart=0;
@@ -2661,6 +2696,19 @@ const TH={
    {h:P('Quadrilaterals','Четырёхугольники'),table:{head:['','parallel pairs · пар параллельных','equal sides · равные стороны','right angles · прямые углы'],rows:[['square · квадрат','2','all 4','4'],['rectangle · прямоугольник','2','opposite','4'],['rhombus · ромб','2','all 4','0'],['parallelogram · параллелограмм','2','opposite','0'],['trapezium · трапеция','1','—','—']]}},
    {h:P('Circles and coordinates','Окружность и координаты'),text:[P('Radius: centre to edge. Diameter: edge to edge through the centre = 2 × radius. r = 7 cm → d = 14 cm.','Радиус — от центра до края. Диаметр — от края до края через центр = 2 × радиус. r = 7 см → d = 14 см.'),P('(x, y): first along (x), then up (y). (2, 5) moved 3 right and 4 down → (5, 1).','(x, y): сначала вдоль (x), потом вверх (y). (2, 5) сдвинули на 3 вправо и 4 вниз → (5, 1).')]}],
   tries:[['Triangle 35° and 85° → third? · третий?','60°'],['200° is… · это…','reflex'],['Diameter 18 cm → radius? · радиус?','9 cm'],['(3, 1): 2 left, 4 up · 2 влево, 4 вверх','(1, 5)']]},
+ poly:{title:P('Polygons, triangles, quadrilaterals, circles','Многоугольники, треугольники, четырёхугольники, окружность'),pw:5,
+  lead:P('Units 3.5 and 3.6: name a shape by its sides and angles.','Темы 3.5 и 3.6: называем фигуру по её сторонам и углам.'),
+  blocks:[
+   {h:P('What is a polygon?','Что такое многоугольник?'),idea:P('A polygon is a CLOSED shape made only of STRAIGHT sides. The sides meet only at the corners (vertices).','Многоугольник — ЗАМКНУТАЯ фигура только из ПРЯМЫХ сторон. Стороны встречаются только в вершинах.'),
+    text:[P('Not polygons: a circle (curved), an open shape (a gap), a shape with a curved side.','Не многоугольники: круг (кривая линия), незамкнутая фигура (есть разрыв), фигура с кривой стороной.')]},
+   {h:P('Names by number of sides','Названия по числу сторон'),table:{head:['sides · стороны','name','название'],rows:POLY.map(p=>[String(p[0]),p[1],p[2]])},
+    tip:['Remember · Запомни','octa = 8 like an octopus · nona = 9 · deca = 10 · dodeca = 12. Spelling: NONAgon, not “nanagon”.','octa = 8, как у осьминога · nona = 9 · deca = 10 · dodeca = 12. Пишется NONAgon, не «nanagon».']},
+   {h:P('Regular polygons','Правильные многоугольники'),idea:P('Regular = ALL sides equal AND ALL angles equal. Small marks on the sides show equal sides; the same symbol in the corners shows equal angles.','Правильный = ВСЕ стороны равны И ВСЕ углы равны. Черточки на сторонах — равные стороны, одинаковые значки в углах — равные углы.'),
+    text:[P('Square ✓, equilateral triangle ✓. Rectangle ✗ (sides differ), rhombus ✗ (angles differ).','Квадрат ✓, равносторонний треугольник ✓. Прямоугольник ✗ (стороны разные), ромб ✗ (углы разные).')]},
+   {h:P('Triangles','Треугольники'),table:{head:['','equal sides · равные стороны'],rows:[['equilateral · равносторонний','all 3'],['isosceles · равнобедренный','at least 2'],['scalene · разносторонний','none']]}},
+   {h:P('Quadrilaterals','Четырёхугольники'),table:{head:['','sides · стороны','angles · углы','parallel · параллельные'],rows:[['square · квадрат','all 4 equal','4 right','2 pairs'],['rectangle · прямоугольник','opposite equal','4 right','2 pairs'],['rhombus · ромб','all 4 equal','opposite equal','2 pairs'],['parallelogram · параллелограмм','opposite equal','opposite equal','2 pairs'],['trapezium · трапеция','—','—','exactly 1 pair'],['kite · дельтоид','2 pairs of equal neighbours','1 pair equal','none']]}},
+   {h:P('Circle','Окружность'),text:[P('Radius: from the centre to the edge. Diameter: edge to edge through the centre = 2 × radius.','Радиус — от центра до края. Диаметр — от края до края через центр = 2 × радиус.')]}],
+  tries:[['9 sides → name? · название?','nonagon'],['Sides 5, 5, 8 cm → type? · тип?','isosceles'],['Exactly 1 pair of parallel sides? · ровно 1 пара параллельных?','trapezium'],['Is a rectangle regular? · прямоугольник правильный?','no · нет']]},
  data:{title:P('Statistics and probability','Статистика и вероятность'),pw:null,
   lead:P('Four words describe a list of numbers. Probability says how likely something is, from 0 to 1.','Четыре слова описывают набор чисел. Вероятность показывает, насколько что-то вероятно, — от 0 до 1.'),
   blocks:[
@@ -2679,7 +2727,7 @@ const TH={
     steps:[P('3x + 5 = 20','3x + 5 = 20'),P('Undo + 5: subtract 5 from both sides → 3x = 15','Убираем + 5: вычитаем 5 из обеих частей → 3x = 15'),P('Undo × 3: divide both sides by 3 → <b>x = 5</b>','Убираем × 3: делим обе части на 3 → <b>x = 5</b>')],tip:['Check · Проверка','3 × 5 + 5 = 20 ✓','3 × 5 + 5 = 20 ✓']}],
   tries:[['Next · Дальше: 5, 9, 13, …','17'],['nth term of · n-й член 2, 5, 8, 11','3n − 1'],['2x − 4 = 10','2x = 14, x = 7'],['b = 3: 4b + 2','14']]}
 };
-const THLIST=[['geom','Angles & shapes','Углы и фигуры'],['theory','HCF & LCM','НОД и НОК'],['divis','Divisibility','Признаки делимости'],['factors','Factors & primes','Делители и простые'],['thFrac','Fractions','Дроби'],['thDec','Decimals','Десятичные'],['place','Place value & rounding','Разряды и округление'],['pct','Percentages','Проценты'],['ratio','Ratio','Пропорции'],['measure','Measurement','Измерения'],['data','Statistics','Статистика'],['alg','Algebra','Алгебра'],['ops','Written methods','Письменные вычисления'],['intneg','Integers','Целые числа'],['bodmas','Order of operations','Порядок действий']];
+const THLIST=[['poly','Polygons & quadrilaterals','Многоугольники и четырёхугольники'],['geom','Angles & shapes','Углы и фигуры'],['theory','HCF & LCM','НОД и НОК'],['divis','Divisibility','Признаки делимости'],['factors','Factors & primes','Делители и простые'],['thFrac','Fractions','Дроби'],['thDec','Decimals','Десятичные'],['place','Place value & rounding','Разряды и округление'],['pct','Percentages','Проценты'],['ratio','Ratio','Пропорции'],['measure','Measurement','Измерения'],['data','Statistics','Статистика'],['alg','Algebra','Алгебра'],['ops','Written methods','Письменные вычисления'],['intneg','Integers','Целые числа'],['bodmas','Order of operations','Порядок действий']];
 function renderTheory(key){
   const T=TH[key];
   const tbl=t=>`<div class="pvwrap"><table class="pv units">${t.head.some(Boolean)?`<tr>${t.head.map(h=>`<th>${h}</th>`).join('')}</tr>`:''}${t.rows.map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join('')}</tr>`).join('')}</table></div>`;
@@ -2782,6 +2830,7 @@ const GX={
   exObj:XS(B('Count on in jumps. An hour has 60 minutes, not 100.','Считай прыжками. В часе 60 минут, а не 100.'),[B(`${h}:${p(m)} → ${h+1}:00 = ${a1} min`,`${h}:${p(m)} → ${h+1}:00 = ${a1} мин`),...(full?[B(`${h+1}:00 → ${h+1+full/60}:00 = ${full} min`,`${h+1}:00 → ${h+1+full/60}:00 = ${full} мин`)]:[]),B(`then ${last} min more to ${eh}:${p(em)}`,`потом ещё ${last} мин до ${eh}:${p(em)}`),B(`${a1}${full?' + '+full:''} + ${last} = ${dur} min`,`${a1}${full?' + '+full:''} + ${last} = ${dur} мин`)])})}
 };
 const TOPIC_GENS={
+ poly:Object.values(G5),
  intneg:[G0.iadd,G0.isub,G0.imul,G0.idiv],bodmas:[G0.ops,GX.ops2],theory:[G1.hcf,G1.lcm],divis:[G1.divis],
  place:[GX.digit,GX.roundw,G3.round,G3.cmp],ops:[GX.colsub,GX.mul2,GX.sdiv],factors:[GX.nfac,GX.prime,GX.sq],
  thFrac:Object.values(G2),thDec:[G3.cmp,G3.round,G3.add,G3.sub,G3.shift,G3.mulw,G3.divw,G3.dd],

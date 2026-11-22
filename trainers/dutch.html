@@ -320,6 +320,11 @@ function explain(q){
     if(q.s.endsWith("?")) return `A “right?” question: normal sentence + “oder?” at the end. The verb stays in position 2.`;
     return `In a German sentence the verb is in position 2: <b>${esc(w0)}</b> | <b>${esc(q.s.split(" ")[1])}</b> | ${esc(q.s.split(" ").slice(2).join(" "))}`; }
   case "lesen": return q.q[3]?`Look at the text: “${esc(q.q[3])}”`:"";
+  case "tijd": { const m=q.m;
+    if(q.mode==="dag") return `0:00–6:00 <b>'s nachts</b> · 6:00–12:00 <b>'s ochtends</b> · 12:00–18:00 <b>'s middags</b> · 18:00–24:00 <b>'s avonds</b>. Dutch uses the 12-hour clock: 17:00 = vijf uur 's middags.`;
+    if(m>=20&&m<=40) return `From :20 to :40 Dutch counts from <b>half</b> the NEXT hour: half ${hr(q.h+1)} = ${clk(q.h,30)}. So ${clk(q.h,20)} = tien <b>voor</b> half ${hr(q.h+1)}, ${clk(q.h,25)} = vijf voor half, ${clk(q.h,35)} = vijf <b>over</b> half, ${clk(q.h,40)} = tien over half ${hr(q.h+1)}.`;
+    if(m===0) return `Full hour: <b>${hr(q.h)} uur</b>. Don't forget the number: “Het is uur” is not enough.`;
+    return `:05, :10, :15 → <b>over</b> this hour (vijf / tien / kwart over ${hr(q.h)}). :45, :50, :55 → <b>voor</b> the next hour (kwart / tien / vijf voor ${hr(q.h+1)}).`; }
   }
   return "";
 }
@@ -425,8 +430,22 @@ const sfxBad=()=>tone([196,147],.18,"sawtooth",.07);
 const sfxWin=()=>tone([523,659,784,1047,1319],.14,"square",.08);
 
 /* ---------------- PROGRESS TRACKING & STATS ---------------- */
+/* 19 Nov: Hoe laat is het? (Opdracht 3–9) */
+const UREN=["twaalf","één","twee","drie","vier","vijf","zes","zeven","acht","negen","tien","elf","twaalf"];
+const hr=h=>UREN[((h-1)%12+12)%12+1];
+function tijdText(h,m){ const n=h+1;
+  return {0:`${hr(h)} uur`,5:`vijf over ${hr(h)}`,10:`tien over ${hr(h)}`,15:`kwart over ${hr(h)}`,20:`tien voor half ${hr(n)}`,25:`vijf voor half ${hr(n)}`,
+   30:`half ${hr(n)}`,35:`vijf over half ${hr(n)}`,40:`tien over half ${hr(n)}`,45:`kwart voor ${hr(n)}`,50:`tien voor ${hr(n)}`,55:`vijf voor ${hr(n)}`}[m]; }
+const clk=(h,m)=>`${((h-1)%12+12)%12+1}:${String(m).padStart(2,"0")}`;
+const DAGDEEL=h=>h<6?"'s nachts":h<12?"'s ochtends":h<18?"'s middags":"'s avonds";
+const MINS=[0,5,10,15,20,25,30,35,40,45,50,55];
+function tijdQ(mode){ const h=mode==="dag"?Math.floor(Math.random()*24):1+Math.floor(Math.random()*12); let m=rnd(MINS);
+  if(mode!=="dag"&&Math.random()<.5) m=rnd([20,25,30,35,40]); if(mode==="dag") m=rnd([0,0,30]); return {type:"tijd",mode,h,m}; }
+function tijdOpts(h,m){ // the right one + typical mix-ups
+  const near={0:[30,55,5],5:[55,35,25],10:[50,40,20],15:[45,35,30],20:[40,10,50],25:[35,5,55],30:[0,25,35],35:[25,5,55],40:[20,10,50],45:[15,40,0],50:[10,40,20],55:[5,25,35]}[m];
+  const o=[[h,m],...near.map(x=>[h,x])]; if(m===30) o[1]=[h+1,30]; return o; }
 const TYPE_NAME={words:"Word quiz",spell:"Spelling",hoeren:"Listening",lesen:"Reading",artikel:"de · het",verbs:"Verb forms",praep:"aus / in",
- dialog:"Questions & answers",caps:"Capital letters",num:"Numbers",datum:"Dates",abc:"Alphabet",satz:"Sentences"};
+ dialog:"Questions & answers",caps:"Capital letters",num:"Numbers",datum:"Dates",abc:"Alphabet",satz:"Sentences",tijd:"Telling the time"};
 const dayKey=d=>{d=d||new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");};
 function itemInfo(q){ // key + label + compact question for replay
   switch(q.type){
@@ -442,6 +461,7 @@ function itemInfo(q){ // key + label + compact question for replay
    case "abc": return {k:"b:"+q.name,l:`Spelling the name ${q.name}`,q};
    case "satz": return {k:"s:"+q.s,l:q.s,q};
    case "lesen": return {k:"l:"+q.q[0],l:`📖 ${q.q[0]}`,q};
+   case "tijd": { const t=q.mode==="dag"?`${tijdText(q.h,q.m)} ${DAGDEEL(q.h)}`:tijdText(q.h,q.m); return {k:"t:"+q.mode+":"+q.h+":"+q.m,l:`${q.mode==="dag"?String(q.h).padStart(2,"0")+":"+String(q.m).padStart(2,"0"):clk(q.h,q.m)} = Het is ${t}.`,q}; }
   } return null; }
 function track(q,ok){
   if(!q) return; const dk=dayKey(); const d=S.days[dk]=S.days[dk]||{q:0,ok:0}; d.q++; if(ok) d.ok++;
@@ -510,6 +530,7 @@ const GAMES={
  lesen:{name:"Reading",ic:"📖",col:"#a8f0c0",desc:"Read a short text, answer"},
  abc:{name:"Alphabet",ic:"🔤",col:"#ffaad4",desc:"Wie schreibt man das?"},
  praep:{name:"aus or in?",ic:"🏙️",col:"#9cd0ff",desc:"Ich komme aus… Ich wohne in…"},
+ tijd:{name:"Hoe laat is het?",ic:"🕒",col:"#c3f0ca",desc:"kwart over, half, vijf voor half…"},
  tricky:{name:"Tricky ones",ic:"🎯",col:"#e9edf2",desc:"Your most-missed questions"},
  satz:{name:"Build sentences",ic:"🧩",col:"#fff07a",desc:"Put the words in order"}
 };
@@ -527,7 +548,7 @@ function home(){
   ${(()=>{const L=levelInfo();return `<div class="lvl"><b>Lv ${L.n} · ${L.title}</b><div class="bar"><i style="width:${L.pct}%"></i></div><span style="white-space:nowrap;font-size:.85rem">${L.left} 🪙 to next</span></div>`})()}
   <div class="grid">${tile("test",stars("test"))}</div>
   <h2>Practise</h2>
-  <div class="grid">${["artikel",canSpeak?"hoeren":null].filter(Boolean).map(k=>tile(k,stars(k))).join("")}</div>
+  <div class="grid">${["tijd","artikel",canSpeak?"hoeren":null].filter(Boolean).map(k=>tile(k,stars(k))).join("")}</div>
   <h2>Words · pages 7–9</h2>
   <div class="ftabs" id="ftabs">${Object.entries(TOPICS).map(([k,t])=>`<button class="ftab ${folder===k?"on":""}" data-f="${k}">📁 ${t.name}<small>words ${t.range}</small></button>`).join("")}<button class="ftab ${folder==="all"?"on":""}" data-f="all">📚 All<small>words 1–50</small></button></div>
   <div class="fpanel">
@@ -589,6 +610,7 @@ function makeQuestions(g){
   if(g==="lesen") return shuffle(READ.flatMap(r=>r.q.map(q=>({type:"lesen",t:r.t,q})))).slice(0,N);
   if(g==="hoeren") return Array.from({length:N},()=>hoerenQ());
   if(g==="tricky") return trickyQuestions();
+  if(g==="tijd") return Array.from({length:N},(_,i)=>tijdQ(["say","read","read","write","say","dag","read","write","say","read"][i]));
   if(g==="test"){
     const all=Object.keys(TOPICS).flatMap(t=>TOPICS[t].items.map(x=>({t,...x})));
     const mk={
@@ -768,6 +790,30 @@ function render(){
     html=`<div class="q"><div class="hint">${gap?"Which question word?":"What is the best answer?"}</div><div class="emoji">💬</div><div class="big" style="font-size:1.7rem">${esc(d.q)}</div>${gap?"":sayBtn(d.q)}</div>
       <div class="opts ${gap?"three":""}">${shuffle(d.o).map(o=>`<button class="opt" data-v="${esc(o)}">${esc(o)}</button>`).join("")}</div>${fbHTML}`;
     after=()=>pickWire(d.a, gap?d.q.replace("___",d.a):d.a, esc(gap?d.q.replace("___",d.a):d.q+" — "+d.a));
+  }
+  else if(q.type==="tijd"){
+    const {h,m,mode}=q, txt=tijdText(h,m), full=`Het is ${txt}.`, c24=String(h).padStart(2,"0")+":"+String(m).padStart(2,"0");
+    if(mode==="say"){
+      const opts=[...new Set(tijdOpts(h,m).map(([a,b])=>tijdText(a,b)))];
+      html=`<div class="q"><div class="hint">Hoe laat is het? Pick the Dutch</div><div class="emoji">🕒</div><div class="big" style="font-size:3rem">${clk(h,m)}</div></div>
+        <div class="opts" style="grid-template-columns:1fr">${shuffle(opts).map(o=>`<button class="opt" data-v="${esc(o)}">Het is ${esc(o)}.</button>`).join("")}</div>${fbHTML}`;
+      after=()=>pickWire(txt,full,`${clk(h,m)} = ${esc(full)}`);
+    } else if(mode==="read"){
+      const opts=[...new Set(tijdOpts(h,m).map(([a,b])=>clk(a,b)))];
+      html=`<div class="q"><div class="hint">Which clock is it?</div><div class="emoji">🕒</div><div class="big" style="font-size:1.6rem">${esc(full)}</div>${sayBtn(full)}</div>
+        <div class="opts">${shuffle(opts).map(o=>`<button class="opt" data-v="${o}">${o}</button>`).join("")}</div>${fbHTML}`;
+      after=()=>{ pickWire(clk(h,m),null,`${esc(full)} = ${clk(h,m)}`); setTimeout(()=>say(full),250); };
+    } else if(mode==="write"){
+      html=`<div class="q"><div class="hint">Write the time in Dutch</div><div class="emoji">🕒</div><div class="big" style="font-size:3rem">${clk(h,m)}</div><div style="color:var(--muted);font-weight:700">Het is …</div></div>
+        <input class="inp" id="inp" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="kwart over drie…"><button class="btn next" id="go">Check</button>${fbHTML}`;
+      after=()=>{ typeWire(txt,"",full); const inp=$("#inp"), go=$("#go"), old=go.onclick; go.onclick=()=>{ inp.value=inp.value.replace(/^\s*het is\s+/i,"").replace(/\been\b/gi,"één"); old(); };
+        inp.onkeydown=e=>{ if(e.key==="Enter"){ e.preventDefault(); if(G.answered) $("#next").click(); else go.onclick(); } }; };
+    } else {
+      const right=`${txt} ${DAGDEEL(h)}`, opts=["'s ochtends","'s middags","'s avonds","'s nachts"].map(d=>`${txt} ${d}`);
+      html=`<div class="q"><div class="hint">Morning, afternoon, evening or night?</div><div class="emoji">🌅☀️🌇🌙</div><div class="big" style="font-size:3rem">${c24}</div></div>
+        <div class="opts" style="grid-template-columns:1fr">${opts.map(o=>`<button class="opt" data-v="${esc(o)}">Het is ${esc(o)}.</button>`).join("")}</div>${fbHTML}`;
+      after=()=>pickWire(right,`Het is ${right}.`,`${c24} = Het is ${esc(right)}.`);
+    }
   }
   else if(q.type==="caps"){
     const ans=CAPS_FIX[q.c];
